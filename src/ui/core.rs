@@ -38,8 +38,9 @@ impl Sandbox for Counter {
         let incr = Button::new("Increment").on_press(CounterMessage::Increment);
         let decr = Button::new("Decrement").on_press(CounterMessage::Decrement);
         let col = Column::new().push(incr).push(label).push(decr);
+        let row = Row::new().push(col);
 
-        Container::new(col)
+        Container::new(row)
             .center_x()
             .center_y()
             .width(iced::Length::Fill)
