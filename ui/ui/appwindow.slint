@@ -1,46 +1,36 @@
 import { SpinBox, Button, CheckBox, Slider, LineEdit, ScrollView, ListView,
     HorizontalBox, VerticalBox, GridBox, StandardButton, StandardTableView } from "std-widgets.slint";
 
-import { ViewFileItem } from "viewfileitem.slint";
+import { ViewToDoItem } from "viewtodoitem.slint";
 
 export component AppWindow inherits Window {
     preferred-width: 800px;
     preferred-height: 600px;
     min-width: 800px;
-    max-height: 600px;
+    min-height: 600px;
 
-    callback file-item-checked(ViewFileItem);
-    callback file-item-unchecked(ViewFileItem);
+    callback item-checked(ViewToDoItem);
+    callback item-unchecked(ViewToDoItem);
 
-    in property <[ViewFileItem]> file-items;
-    in property <[[StandardListViewItem]]> table_row_data: [
-        [
-            { text: "Item 1.1" },
-            { text: "Item 1.2" },
-            { text: "Item 1.3" },
-            { text: "Item 1.4" },
-        ],
-        [
-            { text: "Item 2.1" },
-            { text: "Item 2.2" },
-            { text: "Item 2.3" },
-            { text: "Item 2.4" },
-        ],
+    in property <[ViewToDoItem]> todo-items: [
+        { checked: false, title: "Item 1" },
+        { checked: false, title: "Item 2" },
+        { checked: false, title: "Item 3" },
     ];
 
     VerticalBox {
         ListView {
-            for item in root.file-items: HorizontalLayout {
-                file-item-action := CheckBox {
+            for item in root.todo-items: HorizontalLayout {
+                item-action := CheckBox {
                     text: item.title;
-                    checked: item.selected;
+                    checked: item.checked;
 
                     toggled => {
-                        item.selected = self.checked;
+                        item.checked = self.checked;
                         if (self.checked) {
-                            root.file-item-checked(item);
+                            root.item-checked(item);
                         } else {
-                            root.file-item-unchecked(item);
+                            root.item-unchecked(item);
                         }
                     }
                 }
