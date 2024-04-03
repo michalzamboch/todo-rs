@@ -1,0 +1,34 @@
+import { SpinBox, Button, CheckBox, Slider, LineEdit, ScrollView, ListView,
+    HorizontalBox, VerticalBox, GridBox, StandardButton } from "std-widgets.slint";
+
+export component ActionButtons {
+    callback view <=> viewButton.clicked;
+    callback rename <=> renameButton.clicked;
+    callback copy <=> copyButton.clicked;
+    callback move <=> moveButton.clicked;
+    callback clear <=> clearButton.clicked;
+
+    buttonLayout := HorizontalLayout {
+        spacing: 5px;
+
+        viewButton := Button {
+            text: "View";
+        }
+
+        renameButton := Button {
+            text: "Rename";
+        }
+
+        copyButton := Button {
+            text: "Copy";
+        }
+
+        moveButton := Button {
+            text: "Move";
+        }
+
+        clearButton := Button {
+            text: "Clear";
+        }
+    }
+}

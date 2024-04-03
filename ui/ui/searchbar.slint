@@ -1,0 +1,18 @@
+
+import { SpinBox, Button, CheckBox, Slider, LineEdit, ScrollView, ListView,
+    HorizontalBox, VerticalBox, GridBox, StandardButton } from "std-widgets.slint";
+    
+export component SearchBar {
+    in property <length> bar-height;
+
+    HorizontalLayout {
+        spacing: 5px;
+        serachLine := LineEdit {
+            placeholder-text: "Search...";
+        }
+
+        searchButton := Button {
+            text: "Search";
+        }
+    }
+}
