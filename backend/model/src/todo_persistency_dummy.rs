@@ -9,19 +9,19 @@ struct TodoPersistencyDummy {
     pub data: Vec<TodoDTO>,
 }
 
-impl TodoPersistencyDummy {
-    pub fn create() -> Box<dyn IPeristency<TodoDTO>> {
-        let result = TodoPersistencyDummy {
-            data: vec![
-                TodoDTO::new(1, "Learn rust".to_owned()),
-                TodoDTO::new(2, "Learn egui".to_owned()),
-                TodoDTO::new(3, "Learn slint".to_owned()),
-            ],
-        };
+pub fn create_todo_persistecy_dummy() -> Box<dyn IPeristency<TodoDTO>> {
+    let result = TodoPersistencyDummy {
+        data: vec![
+            TodoDTO::new(1, "Learn rust".to_owned()),
+            TodoDTO::new(2, "Learn egui".to_owned()),
+            TodoDTO::new(3, "Learn slint".to_owned()),
+        ],
+    };
 
-        Box::new(result)
-    }
+    Box::new(result)
 }
+
+impl TodoPersistencyDummy {}
 
 impl IPeristency<TodoDTO> for TodoPersistencyDummy {
     fn load(&self) -> Vec<TodoDTO> {
