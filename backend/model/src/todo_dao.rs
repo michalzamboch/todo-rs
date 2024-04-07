@@ -48,15 +48,25 @@ impl TodoDAOFactory {
 
 impl IDao<TodoDTO> for TodoDAO {
     fn select_by(&self, id: u32) -> Option<TodoDTO> {
-        todo!()
+        for i in self.todos.borrow().iter() {
+            if i.id() == id {
+                return Some(i.clone());
+            }
+        }
+
+        None
     }
 
-    fn insert_row(&mut self, item: TodoDTO) -> Option<TodoDTO> {
+    fn insert_row(&self, item: TodoDTO) -> Result<TodoDTO, Box<dyn Error>> {
+        if self.exists(item.id()) {
+            return Err("Item already exists".into());
+        }
+
         self.todos.borrow_mut().push(item.clone());
-        Some(item)
+        Ok(item)
     }
 
-    fn update_row(&mut self, item: TodoDTO) -> Result<TodoDTO, Box<dyn Error>> {
+    fn update_row(&self, item: TodoDTO) -> Result<TodoDTO, Box<dyn Error>> {
         todo!()
     }
 
@@ -71,5 +81,19 @@ impl IDao<TodoDTO> for TodoDAO {
             max_id = max(max_id, v.id());
         }
         max_id
+    }
+}
+
+impl TodoDAO {
+    pub fn exists(&self, id: u32) -> bool {
+        let values = self.todos.borrow();
+
+        for v in values.iter() {
+            if v.id() == id {
+                return true;
+            }
+        }
+
+        false
     }
 }

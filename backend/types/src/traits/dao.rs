@@ -10,8 +10,8 @@ pub trait IDao<T>: Debug + Send {
 
     fn select_by(&self, id: u32) -> Option<T>;
 
-    fn insert_row(&mut self, item: T) -> Option<T>;
-    fn update_row(&mut self, item: T) -> Result<T, Box<dyn Error>>;
+    fn insert_row(&self, item: T) -> Result<T, Box<dyn Error>>;
+    fn update_row(&self, item: T) -> Result<T, Box<dyn Error>>;
 
 
     fn count(&self) -> u32;
