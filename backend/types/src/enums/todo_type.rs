@@ -2,7 +2,7 @@
 
 use serde::*;
 
-#[derive(Default, Debug, PartialEq, Eq, Clone, Hash, Serialize, Deserialize)]
+#[derive(Default, Debug, Copy, PartialEq, Eq, Clone, Hash, Serialize, Deserialize)]
 pub enum TodoType {
     #[default]
     Generic,

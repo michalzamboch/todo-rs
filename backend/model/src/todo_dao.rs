@@ -1,13 +1,13 @@
 #![allow(dead_code, unused_variables)]
 
-use std::{error::Error, rc::Rc};
+use std::{cell::RefCell, error::Error, rc::Rc};
 
 use crate::{todo_dto::*, todo_persistency_dummy::*};
 use types::traits::{dao::IDao, persistency::IPeristency};
 
 #[derive(Debug)]
 struct TodoDAO {
-    todos: Vec<TodoDTO>,
+    todos: RefCell<Vec<TodoDTO>>,
     persistency: Box<dyn IPeristency<TodoDTO>>,
 }
 
@@ -16,7 +16,7 @@ fn create_todo_dao_dummy() -> TodoDAO {
     let loaded_todos = persistency.load();
     
     TodoDAO {
-        todos: loaded_todos,
+        todos: RefCell::new(loaded_todos),
         persistency,
     }
 }
@@ -30,7 +30,7 @@ pub fn create_todo_dao_dummy_ref() -> Rc<Box<dyn IDao<TodoDTO>>> {
 
 impl TodoDAO {
     fn test(&mut self) {
-        self.todos.push(TodoDTO::default());
+        self.todos.borrow_mut().push(TodoDTO::default());
     }
 }
 
@@ -40,7 +40,7 @@ impl IDao<TodoDTO> for TodoDAO {
     }
 
     fn insert_row(&mut self, item: TodoDTO) -> Option<TodoDTO> {
-        self.todos.push(item.clone());
+        self.todos.borrow_mut().push(item.clone());
         Some(item)
     }
 

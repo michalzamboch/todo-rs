@@ -12,9 +12,9 @@ struct TodoPersistencyDummy {
 pub fn create_todo_persistecy_dummy() -> Box<dyn IPeristency<TodoDTO>> {
     let result = TodoPersistencyDummy {
         data: vec![
-            TodoDTO::new(1, "Learn rust".to_owned()),
-            TodoDTO::new(2, "Learn egui".to_owned()),
-            TodoDTO::new(3, "Learn slint".to_owned()),
+            TodoDTO::new(1, "Learn rust"),
+            TodoDTO::new(2, "Learn egui"),
+            TodoDTO::new(3, "Learn slint"),
         ],
     };
 

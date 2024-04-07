@@ -19,5 +19,6 @@ fn create_new_handler_dummy() -> ModelHandler {
 
 impl ModelHandler {
     fn test(&self) {
+
     }
 }
