@@ -22,23 +22,23 @@ impl TodoDTO {
             ..Default::default()
         }
     }
-    
+
     pub fn id(&self) -> u32 {
         self.id
     }
-    
+
     pub fn uuid(&self) -> Uuid {
         self.uuid
     }
-    
+
     pub fn title(&self) -> &str {
         &self.title
     }
-    
+
     pub fn completed(&self) -> bool {
         self.completed
     }
-    
+
     pub fn todo_type(&self) -> TodoType {
         self.todo_type
     }

@@ -2,9 +2,9 @@
 
 use std::rc::Rc;
 
-use types::traits::dao::IDao;
-use super::todo_dto::*;
 use super::todo_dao::*;
+use super::todo_dto::*;
+use types::traits::dao::IDao;
 
 #[derive(Debug)]
 struct ModelHandler {
@@ -13,12 +13,8 @@ struct ModelHandler {
 
 fn create_new_handler_dummy() -> ModelHandler {
     ModelHandler {
-        todos: create_todo_dao_dummy_ref(),
+        todos: TodoDAOFactory::create_filled_dummy_ref(),
     }
 }
 
-impl ModelHandler {
-    fn test(&self) {
-
-    }
-}
+impl ModelHandler {}

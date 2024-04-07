@@ -1,6 +1,6 @@
 #![allow(dead_code, unused_variables)]
 
-use std::{cell::RefCell, error::Error, rc::Rc};
+use std::{cell::RefCell, cmp::max, error::Error, rc::Rc};
 
 use crate::{todo_dto::*, todo_persistency_dummy::*};
 use types::traits::{dao::IDao, persistency::IPeristency};
@@ -11,26 +11,38 @@ struct TodoDAO {
     persistency: Box<dyn IPeristency<TodoDTO>>,
 }
 
-fn create_todo_dao_dummy() -> TodoDAO {
-    let persistency = create_todo_persistecy_dummy();
-    let loaded_todos = persistency.load();
-    
-    TodoDAO {
-        todos: RefCell::new(loaded_todos),
-        persistency,
+pub struct TodoDAOFactory {}
+
+impl TodoDAOFactory {
+    pub fn create_dummy_ref() -> Rc<Box<dyn IDao<TodoDTO>>> {
+        let dao = Self::create_empty_dummy();
+        let boxed_dao = Box::new(dao);
+
+        Rc::new(boxed_dao)
     }
-}
 
-pub fn create_todo_dao_dummy_ref() -> Rc<Box<dyn IDao<TodoDTO>>> {
-    let dao = create_todo_dao_dummy();
-    let boxed_dao = Box::new(dao);
+    fn create_empty_dummy() -> TodoDAO {
+        TodoDAO {
+            todos: RefCell::new(vec![]),
+            persistency: create_todo_persistecy_dummy(),
+        }
+    }
 
-    Rc::new(boxed_dao)
-}
+    pub fn create_filled_dummy_ref() -> Rc<Box<dyn IDao<TodoDTO>>> {
+        let dao = Self::create_filled_dummy();
+        let boxed_dao = Box::new(dao);
 
-impl TodoDAO {
-    fn test(&mut self) {
-        self.todos.borrow_mut().push(TodoDTO::default());
+        Rc::new(boxed_dao)
+    }
+
+    fn create_filled_dummy() -> TodoDAO {
+        let persistency = create_todo_persistecy_dummy();
+        let loaded_todos = persistency.load();
+
+        TodoDAO {
+            todos: RefCell::new(loaded_todos),
+            persistency,
+        }
     }
 }
 
@@ -49,10 +61,15 @@ impl IDao<TodoDTO> for TodoDAO {
     }
 
     fn count(&self) -> u32 {
-        todo!()
+        self.todos.borrow().len() as u32
     }
 
     fn max_id(&self) -> u32 {
-        todo!()
+        let values = self.todos.borrow();
+        let mut max_id = 0;
+        for v in values.iter() {
+            max_id = max(max_id, v.id());
+        }
+        max_id
     }
 }
