@@ -67,20 +67,18 @@ impl IDao<TodoDTO> for TodoDAO {
     }
 
     fn update_row(&self, item: TodoDTO) -> Result<TodoDTO, Box<dyn Error>> {
-        match self.select_by(item.id()) {
-            Some(i) => {
-                let found = self.todos.borrow().iter().position(|x| x.id() == i.id());
-                match found {
-                    Some(index) => {
-                        self.todos.borrow_mut().remove(index);
-                        self.todos.borrow_mut().push(item.clone());
-                        Ok(item)
-                    }
-                    None => Err("Non existing id.".into()),
-                }
+        let found = self.todos.borrow().iter().position(|x| x.id() == item.id());
+        match found {
+            Some(index) => {
+                self.todos.borrow_mut()[index].update_from_equal(item.clone())?;
+                Ok(item)
             }
             None => Err("Non existing id.".into()),
         }
+    }
+
+    fn remove_row(&self, id: u32) -> Result<(), Box<dyn Error>> {
+        todo!()
     }
 
     fn count(&self) -> u32 {

@@ -1,5 +1,7 @@
 #![allow(dead_code)]
 
+use std::error::Error;
+
 use ::serde::*;
 use types::enums::todo_type::*;
 
@@ -50,5 +52,18 @@ impl TodoDTO {
 
     pub fn equal_by_id(&self, other: &TodoDTO) -> bool {
         self.id() == other.id()
+    }
+
+    pub fn update_from_equal(&mut self, other: TodoDTO) -> Result<(), Box<dyn Error>> {
+        if self.id() != other.id() {
+            return Err("IDs are not equal.".into());
+        }
+
+        self.id = other.id();
+        self.title = other.title().to_owned();
+        self.completed = other.completed();
+        self.todo_type = other.todo_type();
+
+        Ok(())
     }
 }
