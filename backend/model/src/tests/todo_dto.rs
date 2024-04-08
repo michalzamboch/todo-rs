@@ -1,7 +1,6 @@
 #![allow(dead_code, unused_imports)]
 
 use types::enums::todo_type::TodoType;
-use uuid::*;
 
 use crate::todo_dto::*;
 
@@ -16,13 +15,6 @@ fn create_todo() {
     assert_eq!(todo.title(), TEST_TITLE);
     assert_eq!(todo.todo_type(), TodoType::Generic);
     assert_eq!(todo.completed(), false);
-}
-
-#[test]
-fn todo_uuid_not_equal() {
-    let todo = TodoDTO::new(TEST_ID, TEST_TITLE);
-
-    assert_ne!(todo.uuid(), Uuid::new_v4());
 }
 
 #[test]

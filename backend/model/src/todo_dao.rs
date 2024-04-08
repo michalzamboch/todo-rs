@@ -1,6 +1,6 @@
 #![allow(dead_code, unused_variables)]
 
-use std::{cell::RefCell, cmp::max, error::Error, rc::Rc};
+use std::{cell::RefCell, cmp::*, error::Error, rc::Rc};
 
 use crate::{todo_dto::*, todo_persistency_dummy::*};
 use types::traits::{dao::IDao, persistency::IPeristency};
@@ -67,7 +67,20 @@ impl IDao<TodoDTO> for TodoDAO {
     }
 
     fn update_row(&self, item: TodoDTO) -> Result<TodoDTO, Box<dyn Error>> {
-        todo!()
+        match self.select_by(item.id()) {
+            Some(i) => {
+                let found = self.todos.borrow().iter().position(|x| x.id() == i.id());
+                match found {
+                    Some(index) => {
+                        self.todos.borrow_mut().remove(index);
+                        self.todos.borrow_mut().push(item.clone());
+                        Ok(item)
+                    }
+                    None => Err("Non existing id.".into()),
+                }
+            }
+            None => Err("Non existing id.".into()),
+        }
     }
 
     fn count(&self) -> u32 {

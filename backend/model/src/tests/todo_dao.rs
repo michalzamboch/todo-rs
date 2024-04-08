@@ -1,7 +1,6 @@
 #![allow(dead_code, unused_imports)]
 
 use types::enums::todo_type::TodoType;
-use uuid::*;
 
 use crate::todo_dao::*;
 use crate::todo_dto::*;
@@ -30,6 +29,16 @@ fn size_after_insert() {
 }
 
 #[test]
+fn insert_row() {
+    let todo_dao = TodoDAOFactory::create_dummy_ref();
+    todo_dao.insert_row(TodoDTO::new(TEST_ID, TEST_TITLE)).expect("Could not insert row");
+    let result = todo_dao.select_by(TEST_ID);
+
+    assert!(result.is_some());
+    assert_eq!(result.unwrap().id(), TEST_ID);
+}
+
+#[test]
 fn insert_existing_row() {
     let todo_dao = TodoDAOFactory::create_dummy_ref();
     let todo = TodoDTO::new(TEST_ID, TEST_TITLE);
@@ -55,4 +64,20 @@ fn select_nothing() {
     let todo = todo_dao.select_by(100);
 
     assert!(todo.is_none())
+}
+
+#[test]
+fn update_existing_row() {
+    let todo_dao = TodoDAOFactory::create_dummy_ref();
+    let todo = TodoDTO::new(TEST_ID, TEST_TITLE);
+
+    let mut inserted = todo_dao.insert_row(todo).expect("Missing todo.");
+
+    let new_title = "New title";
+    inserted.set_title(new_title);
+
+    let updated = todo_dao.update_row(inserted);
+
+    assert!(updated.is_ok());
+    assert_eq!(updated.unwrap().title(), new_title);
 }

@@ -2,12 +2,10 @@
 
 use ::serde::*;
 use types::enums::todo_type::*;
-use uuid::*;
 
 #[derive(Debug, Default, Clone, Hash, PartialEq, Eq, Serialize, Deserialize)]
 pub struct TodoDTO {
     id: u32,
-    uuid: Uuid,
     title: String,
     completed: bool,
     todo_type: TodoType,
@@ -18,17 +16,12 @@ impl TodoDTO {
         TodoDTO {
             id,
             title: title.to_owned(),
-            uuid: Uuid::new_v4(),
             ..Default::default()
         }
     }
 
     pub fn id(&self) -> u32 {
         self.id
-    }
-
-    pub fn uuid(&self) -> Uuid {
-        self.uuid
     }
 
     pub fn title(&self) -> &str {
@@ -41,6 +34,18 @@ impl TodoDTO {
 
     pub fn todo_type(&self) -> TodoType {
         self.todo_type
+    }
+
+    pub fn set_title(&mut self, title: &str) {
+        self.title = title.to_owned();
+    }
+
+    pub fn set_completed(&mut self, completed: bool) {
+        self.completed = completed;
+    }
+
+    pub fn set_todo_type(&mut self, todo_type: TodoType) {
+        self.todo_type = todo_type;
     }
 
     pub fn equal_by_id(&self, other: &TodoDTO) -> bool {
