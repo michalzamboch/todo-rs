@@ -78,7 +78,14 @@ impl IDao<TodoDTO> for TodoDAO {
     }
 
     fn remove_row(&self, id: u32) -> Result<(), Box<dyn Error>> {
-        todo!()
+        let found = self.todos.borrow().iter().position(|x| x.id() == id);
+        match found {
+            Some(index) => {
+                self.todos.borrow_mut().remove(index);
+                Ok(())
+            }
+            None => Err("Non existing id.".into()),
+        }
     }
 
     fn count(&self) -> u32 {

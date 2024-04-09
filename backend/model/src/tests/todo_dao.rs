@@ -81,3 +81,28 @@ fn update_existing_row() {
     assert!(updated.is_ok());
     assert_eq!(updated.unwrap().title(), new_title);
 }
+
+#[test]
+fn remove_row() {
+    let todo_dao = TodoDAOFactory::create_dummy_ref();
+
+    for i in 0..3 {
+        let todo = TodoDTO::new(i, TEST_TITLE);
+        todo_dao.insert_row(todo).expect("Unable to insert row");
+    }
+
+    assert_eq!(todo_dao.count(), 3);
+
+    let result = todo_dao.remove_row(0);
+    assert!(result.is_ok());
+    assert_eq!(todo_dao.count(), 2);
+}
+
+#[test]
+fn removal_of_non_existing_row() {
+    let todo_dao = TodoDAOFactory::create_dummy_ref();
+
+    let result = todo_dao.remove_row(0);
+    assert!(result.is_err());
+    assert_eq!(todo_dao.count(), 0);
+}

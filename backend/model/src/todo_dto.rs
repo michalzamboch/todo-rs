@@ -1,6 +1,7 @@
 #![allow(dead_code)]
 
 use std::error::Error;
+use std::fmt;
 
 use ::serde::*;
 use types::enums::todo_type::*;
@@ -65,5 +66,15 @@ impl TodoDTO {
         self.todo_type = other.todo_type();
 
         Ok(())
+    }
+}
+
+impl fmt::Display for TodoDTO {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let result = format!(
+            "ID: {} title: {} completed: {} type: {}",
+            self.id, self.title, self.completed, self.todo_type
+        );
+        write!(f, "{}", result)
     }
 }
