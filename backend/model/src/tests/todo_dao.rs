@@ -106,3 +106,28 @@ fn removal_of_non_existing_row() {
     assert!(result.is_err());
     assert_eq!(todo_dao.count(), 0);
 }
+
+#[test]
+fn get_all() {
+    let todo_dao = TodoDAOFactory::create_dummy_ref();
+    let count = 3;
+
+    for i in 0..count {
+        let todo = TodoDTO::new(i, TEST_TITLE);
+        todo_dao.insert_row(todo).expect("Unable to insert row");
+    }
+
+    assert_eq!(todo_dao.count(), count);
+
+    let todos = todo_dao.get_all();
+    assert_eq!(todos.len() as u32, count);
+}
+
+#[test]
+fn get_empty_vec() {
+    let todo_dao = TodoDAOFactory::create_dummy_ref();
+    let todos = todo_dao.get_all();
+
+    assert_eq!(todos.len(), 0);
+    assert_eq!(todo_dao.count(), 0);
+}

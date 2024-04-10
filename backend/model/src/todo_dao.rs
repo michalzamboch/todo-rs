@@ -1,6 +1,6 @@
 #![allow(dead_code, unused_variables)]
 
-use std::{cell::RefCell, cmp::*, error::Error, rc::Rc};
+use std::{cell::RefCell, cmp::*, error::Error, ops::Deref, rc::Rc};
 
 use crate::{todo_dto::*, todo_persistency_dummy::*};
 use types::traits::{dao::IDao, persistency::IPeristency};
@@ -37,7 +37,7 @@ impl TodoDAOFactory {
 
     fn create_filled_dummy() -> TodoDAO {
         let persistency = create_todo_persistency_dummy();
-        let loaded_todos = persistency.load();
+        let loaded_todos = persistency.load().unwrap_or_default();
 
         TodoDAO {
             todos: RefCell::new(loaded_todos),
@@ -55,6 +55,10 @@ impl IDao<TodoDTO> for TodoDAO {
         }
 
         None
+    }
+
+    fn get_all(&self) -> Vec<TodoDTO> {
+        self.todos.borrow().deref().clone()
     }
 
     fn insert_row(&self, item: TodoDTO) -> Result<TodoDTO, Box<dyn Error>> {

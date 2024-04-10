@@ -12,6 +12,8 @@ const TEST_TITLE: &str = "Test title";
 #[test]
 fn save_dummy() {
     let persistent = create_todo_persistency_dummy();
-    let data = persistent.load();
-    persistent.save(data);
+    let data = persistent.load().unwrap_or_default();
+    let result = persistent.save(data);
+
+    assert!(result.is_ok())
 }
