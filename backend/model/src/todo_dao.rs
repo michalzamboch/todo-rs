@@ -61,21 +61,21 @@ impl IDao<TodoDTO> for TodoDAO {
         self.todos.borrow().deref().clone()
     }
 
-    fn insert_row(&self, item: TodoDTO) -> Result<TodoDTO, Box<dyn Error>> {
+    fn insert_row(&self, item: &TodoDTO) -> Result<(), Box<dyn Error>> {
         if self.exists(item.id()) {
             return Err("Item already exists".into());
         }
 
         self.todos.borrow_mut().push(item.clone());
-        Ok(item)
+        Ok(())
     }
 
-    fn update_row(&self, item: TodoDTO) -> Result<TodoDTO, Box<dyn Error>> {
+    fn update_row(&self, item: &TodoDTO) -> Result<(), Box<dyn Error>> {
         let found = self.todos.borrow().iter().position(|x| x.id() == item.id());
         match found {
             Some(index) => {
                 self.todos.borrow_mut()[index].update_from_equal(item.clone())?;
-                Ok(item)
+                Ok(())
             }
             None => Err("Non existing id.".into()),
         }

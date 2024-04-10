@@ -21,7 +21,7 @@ fn create_empty_todo_dao() {
 #[test]
 fn size_after_insert() {
     let todo_dao = TodoDAOFactory::create_dummy_ref();
-    let result = todo_dao.insert_row(TodoDTO::new(TEST_ID, TEST_TITLE));
+    let result = todo_dao.insert_row(&TodoDTO::new(TEST_ID, TEST_TITLE));
 
     assert_eq!(todo_dao.count(), 1);
     assert_eq!(todo_dao.max_id(), 1);
@@ -31,7 +31,9 @@ fn size_after_insert() {
 #[test]
 fn insert_row() {
     let todo_dao = TodoDAOFactory::create_dummy_ref();
-    todo_dao.insert_row(TodoDTO::new(TEST_ID, TEST_TITLE)).expect("Could not insert row");
+    todo_dao
+        .insert_row(&TodoDTO::new(TEST_ID, TEST_TITLE))
+        .expect("Could not insert row");
     let result = todo_dao.select_by(TEST_ID);
 
     assert!(result.is_some());
@@ -42,8 +44,8 @@ fn insert_row() {
 fn insert_existing_row() {
     let todo_dao = TodoDAOFactory::create_dummy_ref();
     let todo = TodoDTO::new(TEST_ID, TEST_TITLE);
-    let first = todo_dao.insert_row(todo.clone());
-    let second = todo_dao.insert_row(todo);
+    let first = todo_dao.insert_row(&todo);
+    let second = todo_dao.insert_row(&todo);
 
     assert_eq!(todo_dao.count(), 1);
     assert!(first.is_ok());
@@ -69,17 +71,18 @@ fn select_nothing() {
 #[test]
 fn update_existing_row() {
     let todo_dao = TodoDAOFactory::create_dummy_ref();
-    let todo = TodoDTO::new(TEST_ID, TEST_TITLE);
+    let mut todo = TodoDTO::new(TEST_ID, TEST_TITLE);
 
-    let mut inserted = todo_dao.insert_row(todo).expect("Missing todo.");
+    todo_dao.insert_row(&todo).expect("Unable to insert row.");
 
     let new_title = "New title";
-    inserted.set_title(new_title);
+    todo.set_title(new_title);
 
-    let updated = todo_dao.update_row(inserted);
-
+    let updated = todo_dao.update_row(&todo);
     assert!(updated.is_ok());
-    assert_eq!(updated.unwrap().title(), new_title);
+
+    let updated_row = todo_dao.select_by(TEST_ID);
+    assert!(updated_row.is_some_and(|item| item.title() == new_title));
 }
 
 #[test]
@@ -88,7 +91,7 @@ fn remove_row() {
 
     for i in 0..3 {
         let todo = TodoDTO::new(i, TEST_TITLE);
-        todo_dao.insert_row(todo).expect("Unable to insert row");
+        todo_dao.insert_row(&todo).expect("Unable to insert row");
     }
 
     assert_eq!(todo_dao.count(), 3);
@@ -114,7 +117,7 @@ fn get_all() {
 
     for i in 0..count {
         let todo = TodoDTO::new(i, TEST_TITLE);
-        todo_dao.insert_row(todo).expect("Unable to insert row");
+        todo_dao.insert_row(&todo).expect("Unable to insert row");
     }
 
     assert_eq!(todo_dao.count(), count);
