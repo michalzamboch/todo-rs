@@ -24,7 +24,7 @@ impl TodoDAOFactory {
     fn create_empty_dummy() -> TodoDAO {
         TodoDAO {
             todos: RefCell::new(vec![]),
-            persistency: create_todo_persistecy_dummy(),
+            persistency: create_todo_persistency_dummy(),
         }
     }
 
@@ -36,7 +36,7 @@ impl TodoDAOFactory {
     }
 
     fn create_filled_dummy() -> TodoDAO {
-        let persistency = create_todo_persistecy_dummy();
+        let persistency = create_todo_persistency_dummy();
         let loaded_todos = persistency.load();
 
         TodoDAO {

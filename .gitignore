@@ -1,3 +1,5 @@
 target/
 
 *.lock
+
+todo_persistency.json
