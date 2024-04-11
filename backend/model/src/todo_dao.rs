@@ -2,7 +2,7 @@
 
 use std::{cell::RefCell, cmp::*, error::Error, ops::Deref, rc::Rc};
 
-use crate::{todo_dto::*, todo_persistency_dummy::*};
+use crate::{paths::*, todo_dto::*, todo_persistency_dummy::*, todo_persistency_json::*};
 use types::traits::{dao::IDao, persistency::IPeristency};
 
 #[derive(Debug)]
@@ -14,6 +14,23 @@ struct TodoDAO {
 pub struct TodoDAOFactory {}
 
 impl TodoDAOFactory {
+    pub fn create() -> Rc<Box<dyn IDao<TodoDTO>>> {
+        let dao = Self::create_loaded();
+        let boxed_dao = Box::new(dao);
+
+        Rc::new(boxed_dao)
+    }
+
+    fn create_loaded() -> TodoDAO {
+        let persistency = create_todo_json_persistency(JSON_TODO_FILEPATH);
+        let loaded_todos = persistency.load().unwrap_or_default();
+
+        TodoDAO {
+            todos: RefCell::new(loaded_todos),
+            persistency,
+        }
+    }
+
     pub fn create_dummy_ref() -> Rc<Box<dyn IDao<TodoDTO>>> {
         let dao = Self::create_empty_dummy();
         let boxed_dao = Box::new(dao);

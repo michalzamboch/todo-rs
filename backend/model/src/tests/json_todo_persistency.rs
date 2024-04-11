@@ -1,6 +1,6 @@
 #![allow(dead_code, unused_imports)]
 
-use std::{error::Error, fs};
+use std::{error::Error, fs, result};
 
 use types::enums::todo_type::TodoType;
 
@@ -11,12 +11,12 @@ const TEST_TITLE: &str = "Test title";
 const TEST_PATH: &str = "src/tests/files/todo_test_data.json";
 
 #[test]
-fn save_data() {
-    let persistent = create_todo_json_persistency(TEST_PATH);
-    let data = persistent.load().unwrap_or_default();
-    let result = persistent.save(data);
+fn load_data() {
+    let persistency = create_todo_json_persistency(TEST_PATH);
+    let result = persistency.load();
 
-    assert!(result.is_ok())
+    assert!(result.is_ok());
+    assert_eq!(result.unwrap().len(), 3);
 }
 
 fn compare_files(file_path1: &str, file_path2: &str) -> Result<bool, Box<dyn Error>> {

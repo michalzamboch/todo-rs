@@ -12,11 +12,7 @@ export component AppWindow inherits Window {
     callback item-checked(ViewToDoItem);
     callback item-unchecked(ViewToDoItem);
 
-    in property <[ViewToDoItem]> todo-items: [
-        { checked: false, title: "Item 1" },
-        { checked: false, title: "Item 2" },
-        { checked: false, title: "Item 3" },
-    ];
+    in property <[ViewToDoItem]> todo-items;
 
     VerticalBox {
         ListView {
