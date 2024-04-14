@@ -17,9 +17,12 @@ export component AppWindow inherits Window {
     VerticalBox {
         ListView {
             for item in root.todo-items: HorizontalLayout {
+                spacing: 10px;
+
                 item-action := CheckBox {
-                    text: item.title;
+                    in property <ViewToDoItem> todo: item;
                     checked: item.checked;
+                    horizontal-stretch: 0;
 
                     toggled => {
                         item.checked = self.checked;
@@ -30,6 +33,12 @@ export component AppWindow inherits Window {
                         }
                     }
                 }
+
+                Text {
+                    text: item.title;
+                    horizontal-stretch: 1;
+                }
+
             }
         }
     }

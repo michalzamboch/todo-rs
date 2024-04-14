@@ -6,9 +6,11 @@ use super::todo_dao::*;
 use super::todo_dto::*;
 use types::traits::dao::*;
 
+type DaoTODO = Rc<Box<dyn IDao<TodoDTO>>>;
+
 #[derive(Debug)]
 pub struct ModelHandler {
-    todos: Rc<Box<dyn IDao<TodoDTO>>>,
+    todos: DaoTODO,
 }
 
 pub fn create_new_handler() -> ModelHandler {
@@ -18,7 +20,7 @@ pub fn create_new_handler() -> ModelHandler {
 }
 
 impl ModelHandler {
-    pub fn todos(&self) -> Rc<Box<dyn IDao<TodoDTO>>> {
+    pub fn todos(&self) -> DaoTODO {
         self.todos.clone()
     }
 }
