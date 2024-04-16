@@ -1,6 +1,14 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
 
-use eframe::egui;
+use std::borrow::BorrowMut;
+
+use eframe::{
+    egui::{
+        self, Align, CentralPanel, Checkbox, Hyperlink, Label, Layout, ScrollArea, Separator, TextStyle, TopBottomPanel, Ui, Vec2, Widget
+    },
+    run_native, NativeOptions,
+};
+
 
 pub fn run() -> Result<(), eframe::Error> {
     env_logger::init(); // Log to stderr (if you run with `RUST_LOG=debug`).
@@ -54,19 +62,51 @@ impl Default for MyApp {
 impl eframe::App for MyApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         egui::CentralPanel::default().show(ctx, |ui| {
-            ui.heading("Todo List");
-
             ui.vertical_centered(|ui| {
-                let max_size = ui.max_rect();
+                ui.heading("Todo List");
+            });
 
-                let mut child_ui = ui.child_ui(max_size, egui::Layout::top_down(egui::Align::Min));
+            ui.vertical(|ui| {
+                for item in self.todos.iter_mut() {
+                    ui.add_space(5.);
 
-                for todo in self.todos.iter_mut() {
-                    child_ui.horizontal(|ui| {
-                        ui.checkbox(&mut todo.checked, todo.title.as_str());
+                    ui.horizontal(|ui| {
+                        ui.with_layout(Layout::left_to_right(Align::LEFT), |ui| {
+                            let check_box = Checkbox::new(&mut item.checked, item.title.clone());
+                            ui.add(check_box);
+                        });
+
+                        ui.with_layout(Layout::right_to_left(Align::RIGHT), |ui| {
+                            let label = Label::new("1.1.2024".to_owned());
+                            ui.add(label);
+                        });
                     });
                 }
             });
+
         });
+    }
+    
+    fn save(&mut self, _storage: &mut dyn eframe::Storage) {}
+    
+    fn on_exit(&mut self, _gl: Option<&eframe::glow::Context>) {
+        println!("Exit");
+    }
+    
+    fn auto_save_interval(&self) -> std::time::Duration {
+        std::time::Duration::from_secs(30)
+    }
+    
+    fn clear_color(&self, _visuals: &egui::Visuals) -> [f32; 4] {
+        // NOTE: a bright gray makes the shadows of the windows look weird.
+        // We use a bit of transparency so that if the user switches on the
+        // `transparent()` option they get immediate results.
+        egui::Color32::from_rgba_unmultiplied(12, 12, 12, 180).to_normalized_gamma_f32()
+    
+        // _visuals.window_fill() would also be a natural choice
+    }
+    
+    fn persist_egui_memory(&self) -> bool {
+        true
     }
 }
