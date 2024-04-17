@@ -33,13 +33,26 @@ export component AppWindow inherits Window {
                         }
                     }
                 }
-
-                Text {
-                    text: item.title;
-                    horizontal-stretch: 1;
-                }
-
             }
+        }
+
+        in property <[[StandardListViewItem]]> table_row_data: [
+            [
+                { text: "Item 1.1" },
+                { text: "" },
+                { text: "" },
+                { text: "Item 1.4" },
+            ],
+            [
+                { text: "Item 2.1" },
+                { text: "" },
+                { text: "" },
+                { text: "Item 2.4" },
+            ],
+        ];
+
+        mainTable := StandardTableView {
+            rows: table_row_data;
         }
     }
 }
