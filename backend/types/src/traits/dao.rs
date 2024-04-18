@@ -1,4 +1,4 @@
-use std::{error::Error, fmt::Debug};
+use std::{error::Error, fmt::Debug, rc::Rc};
 
 pub trait IDao<T>: Debug + Send {
     fn select_by(&self, id: u32) -> Option<T>;
@@ -10,4 +10,7 @@ pub trait IDao<T>: Debug + Send {
 
     fn count(&self) -> u32;
     fn max_id(&self) -> u32;
+    fn exists(&self, id: u32) -> bool;
 }
+
+pub type DaoRef<T> = Rc<Box<dyn IDao<T>>>;

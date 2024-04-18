@@ -1,6 +1,9 @@
-#![allow(dead_code, unused_imports)]
+#![allow(dead_code, unused_imports, unused_variables)]
+
+use test_case::test_case;
 
 use types::enums::todo_type::TodoType;
+use types::traits::dao::*;
 
 use crate::todo_dao::*;
 use crate::todo_dto::*;
@@ -134,3 +137,6 @@ fn get_empty_vec() {
     assert_eq!(todos.len(), 0);
     assert_eq!(todo_dao.count(), 0);
 }
+
+#[test_case(TodoDAOFactory::create_dummy_ref(); "Regular DAO")]
+fn test_case_example(dao: DaoRef<TodoDTO>) {}

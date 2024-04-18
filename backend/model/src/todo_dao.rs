@@ -121,10 +121,8 @@ impl IDao<TodoDTO> for TodoDAO {
         }
         max_id
     }
-}
 
-impl TodoDAO {
-    pub fn exists(&self, id: u32) -> bool {
+    fn exists(&self, id: u32) -> bool {
         let values = self.todos.borrow();
 
         for v in values.iter() {

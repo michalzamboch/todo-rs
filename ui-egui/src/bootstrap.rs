@@ -60,7 +60,7 @@ impl eframe::App for MyApp {
             });
 
             ui.vertical(|ui| {
-                for item in self.todos.iter_mut() {
+                for item in self.todos.iter() {
                     ui.add_space(5.);
 
                     ui.horizontal(|ui| {
