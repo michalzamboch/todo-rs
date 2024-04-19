@@ -3,16 +3,20 @@
 
 use eframe::egui::{self, *};
 
+use crate::constants::*;
+
 pub fn run() -> Result<(), eframe::Error> {
     env_logger::init(); // Log to stderr (if you run with `RUST_LOG=debug`).
 
     let options = eframe::NativeOptions {
-        viewport: egui::ViewportBuilder::default().with_inner_size([320.0, 240.0]),
+        viewport: egui::ViewportBuilder::default()
+            .with_inner_size(DEFAULT_WINDOW_SIZE)
+            .with_min_inner_size(DEFAULT_WINDOW_SIZE),
         ..Default::default()
     };
 
     eframe::run_native(
-        "My egui App",
+        "Todo-rs",
         options,
         Box::new(|cc| {
             egui_extras::install_image_loaders(&cc.egui_ctx);
@@ -84,6 +88,8 @@ impl eframe::App for MyApp {
                             ui.add(label);
                         });
                     });
+
+                    ui.separator();
                 }
             });
         });
