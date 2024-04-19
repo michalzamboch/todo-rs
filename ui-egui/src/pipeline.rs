@@ -3,35 +3,65 @@
 use std::collections::*;
 
 use backend::todo_dto::*;
+use types::traits::dao::*;
 
 #[derive(Debug, Default, Clone, Hash, PartialEq, Eq)]
 pub enum PipelineCommand {
     #[default]
     None,
-    DeleteTodo(TodoDTO),
-    CreateTodo(TodoDTO),
-    UpdateTodo(TodoDTO),
+    Delete(TodoDTO),
+    Create(TodoDTO),
+    Update(TodoDTO),
 }
 
-#[derive(Debug, Default, Clone, Hash, PartialEq, Eq)]
-pub struct ViewPipeline {
+#[derive(Debug, Clone)]
+pub struct TodoPipeline {
+    dao: DaoRef<TodoDTO>,
     commands: VecDeque<PipelineCommand>,
 }
 
-impl ViewPipeline {
-    pub fn execute(&mut self) {
+pub fn create_todo_pipeline(dao: DaoRef<TodoDTO>) -> Box<TodoPipeline> {
+    let pipeline = TodoPipeline {
+        dao: dao.clone(),
+        commands: VecDeque::new(),
+    };
+
+    Box::new(pipeline)
+}
+
+impl TodoPipeline {
+    pub fn execute(&mut self) -> bool {
+        let clear = !self.commands.is_empty();
+        let mut update = false;
+
         for cmd in self.commands.iter() {
-            self.execute_command(cmd);
+            update |= self.execute_command(cmd);
         }
-        self.commands.clear();
+
+        if clear {
+            self.commands.clear();
+        }
+
+        update
     }
 
-    fn execute_command(&self, cmd: &PipelineCommand) {
+    fn execute_command(&self, cmd: &PipelineCommand) -> bool {
         match cmd {
-            PipelineCommand::None => (),
-            PipelineCommand::DeleteTodo(_todo) => todo!(),
-            PipelineCommand::CreateTodo(_todo) => todo!(),
-            PipelineCommand::UpdateTodo(_todo) => todo!(),
+            PipelineCommand::None => false,
+            PipelineCommand::Delete(todo) => {
+                self.dao
+                    .remove_row(todo.id())
+                    .expect("Unable to remove row");
+                true
+            }
+            PipelineCommand::Create(todo) => {
+                self.dao.insert_row(todo).expect("Unable to insert row");
+                true
+            }
+            PipelineCommand::Update(todo) => {
+                self.dao.update_row(todo).expect("Unable to update row");
+                true
+            }
         }
     }
 

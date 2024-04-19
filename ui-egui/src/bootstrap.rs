@@ -1,10 +1,13 @@
-#![allow(dead_code)]
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
 
-use backend::model_handler::{create_new_handler, ModelHandler};
+use crate::pipeline::PipelineCommand::*;
+use backend::{model_handler::*, todo_dto::*};
 use eframe::egui::{self, *};
 
-use crate::constants::*;
+use crate::{
+    constants::*,
+    pipeline::{create_todo_pipeline, TodoPipeline},
+};
 
 pub fn run() -> Result<(), eframe::Error> {
     env_logger::init(); // Log to stderr (if you run with `RUST_LOG=debug`).
@@ -28,43 +31,24 @@ pub fn run() -> Result<(), eframe::Error> {
 }
 
 fn create_filled_view() -> Box<AppView> {
-    let app_view = AppView{
-        model: create_new_handler(),
-        todos: create_view_todos(),
+    let model = create_new_handler();
+    let todos = model.todos().get_all();
+    let todo_pipeline = create_todo_pipeline(model.todos());
+
+    let app_view = AppView {
+        model,
+        todos,
+        todo_pipeline,
     };
 
     Box::new(app_view)
 }
 
-fn create_view_todos() -> Vec<ToDoItem> {
-    let mut todos = Vec::new();
-
-    todos.push(ToDoItem {
-        checked: false,
-        title: "Learn Rust".into(),
-    });
-    todos.push(ToDoItem {
-        checked: false,
-        title: "Learn Egui".into(),
-    });
-    todos.push(ToDoItem {
-        checked: false,
-        title: "Learn Slint".into(),
-    });
-
-    todos
-}
-
 #[derive(Debug)]
 struct AppView {
     model: Box<ModelHandler>,
-    todos: Vec<ToDoItem>,
-}
-
-#[derive(Debug, Default, Clone, Hash, PartialEq, Eq)]
-struct ToDoItem {
-    checked: bool,
-    title: String,
+    todos: Vec<TodoDTO>,
+    todo_pipeline: Box<TodoPipeline>,
 }
 
 impl AppView {
@@ -88,9 +72,10 @@ impl AppView {
 
                         ui.horizontal(|ui| {
                             ui.with_layout(Layout::left_to_right(Align::LEFT), |ui| {
-                                let check_btn = Checkbox::without_text(&mut item.checked);
+                                let check_btn = Checkbox::without_text(&mut item.completed);
                                 let check_btn_respose = ui.add(check_btn);
                                 if check_btn_respose.clicked() {
+                                    self.todo_pipeline.push(Delete(item.clone()));
                                     println!("Clicked check box: {}", item.title);
                                 }
 
@@ -124,6 +109,10 @@ impl AppView {
 
 impl eframe::App for AppView {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+        let update = self.todo_pipeline.execute();
+        if update {
+            self.todos = self.model.todos().get_all();
+        }
         self.create_header(ctx);
         self.create_vertical_layout(ctx);
         self.create_footer(ctx);
