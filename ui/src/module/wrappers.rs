@@ -16,7 +16,7 @@ pub fn todos_to_ui_elements(todos: &[TodoDTO]) -> Vec<ViewToDoItem> {
 pub fn todo_to_viewtodo(todo: &TodoDTO) -> ViewToDoItem {
     ViewToDoItem {
         id: todo.id() as i32,
-        title: todo.title().into(),
-        checked: todo.completed(),
+        title: todo.title.clone().into(),
+        checked: todo.completed,
     }
 }

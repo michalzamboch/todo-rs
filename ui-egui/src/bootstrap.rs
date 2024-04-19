@@ -1,6 +1,7 @@
 #![allow(dead_code)]
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
 
+use backend::model_handler::{create_new_handler, ModelHandler};
 use eframe::egui::{self, *};
 
 use crate::constants::*;
@@ -27,8 +28,10 @@ pub fn run() -> Result<(), eframe::Error> {
 }
 
 fn create_filled_view() -> Box<AppView> {
-    let mut app_view = AppView::default();
-    app_view.todos = create_view_todos();
+    let app_view = AppView{
+        model: create_new_handler(),
+        todos: create_view_todos(),
+    };
 
     Box::new(app_view)
 }
@@ -52,8 +55,9 @@ fn create_view_todos() -> Vec<ToDoItem> {
     todos
 }
 
-#[derive(Debug, Default, Clone, Hash, PartialEq, Eq)]
+#[derive(Debug)]
 struct AppView {
+    model: Box<ModelHandler>,
     todos: Vec<ToDoItem>,
 }
 
