@@ -21,50 +21,49 @@ pub fn run() -> Result<(), eframe::Error> {
         Box::new(|cc| {
             egui_extras::install_image_loaders(&cc.egui_ctx);
 
-            Box::<MyApp>::default()
+            create_filled_view()
         }),
     )
 }
 
-struct MyApp {
+fn create_filled_view() -> Box<AppView> {
+    let mut app_view = AppView::default();
+    app_view.todos = create_view_todos();
+
+    Box::new(app_view)
+}
+
+fn create_view_todos() -> Vec<ToDoItem> {
+    let mut todos = Vec::new();
+
+    todos.push(ToDoItem {
+        checked: false,
+        title: "Learn Rust".into(),
+    });
+    todos.push(ToDoItem {
+        checked: false,
+        title: "Learn Egui".into(),
+    });
+    todos.push(ToDoItem {
+        checked: false,
+        title: "Learn Slint".into(),
+    });
+
+    todos
+}
+
+#[derive(Debug, Default, Clone, Hash, PartialEq, Eq)]
+struct AppView {
     todos: Vec<ToDoItem>,
 }
 
+#[derive(Debug, Default, Clone, Hash, PartialEq, Eq)]
 struct ToDoItem {
     checked: bool,
     title: String,
 }
 
-impl Default for MyApp {
-    fn default() -> Self {
-        Self {
-            todos: vec![
-                ToDoItem {
-                    checked: false,
-                    title: "Learn Rust".to_owned(),
-                },
-                ToDoItem {
-                    checked: false,
-                    title: "Learn egui".to_owned(),
-                },
-                ToDoItem {
-                    checked: false,
-                    title: "Learn egui_extras".to_owned(),
-                },
-            ],
-        }
-    }
-}
-
-impl MyApp {
-    pub fn insert_test(&mut self) {
-        let item = ToDoItem {
-            checked: false,
-            title: "".into(),
-        };
-        self.todos.push(item);
-    }
-
+impl AppView {
     fn create_header(&mut self, ctx: &egui::Context) {
         egui::TopBottomPanel::top("Header").show(ctx, |ui| {
             ui.add_space(5.);
@@ -119,7 +118,7 @@ impl MyApp {
     }
 }
 
-impl eframe::App for MyApp {
+impl eframe::App for AppView {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         self.create_header(ctx);
         self.create_vertical_layout(ctx);
