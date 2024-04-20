@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
 
-use crate::{todo_handler::*, todo_pipeline::PipelineCommand::*};
+use crate::{todo_cache::*, todo_handler::*, todo_pipeline::PipelineCommand::*};
 
 use backend::model_handler::*;
 use eframe::egui::{self, *};
@@ -9,10 +9,13 @@ use eframe::egui::{self, *};
 pub fn create_filled_view() -> Box<AppView> {
     let model = create_new_handler();
     let todo_handler = create_todo_handler(model.todos());
+    let mut todo_cache = create_todo_cache();
+    todo_cache.items = model.todos().get_all();
 
     let app_view = AppView {
         model,
         todo_handler,
+        todo_cache,
     };
 
     Box::new(app_view)
@@ -22,11 +25,12 @@ pub fn create_filled_view() -> Box<AppView> {
 pub struct AppView {
     model: Box<ModelHandler>,
     todo_handler: Box<TodoViewHandler>,
+    todo_cache: Box<TodoCache>,
 }
 
 impl eframe::App for AppView {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-        self.todo_handler.update();
+        self.process_pipeline();
         self.create_header(ctx);
         self.create_vertical_layout(ctx);
         self.create_footer(ctx);
@@ -81,25 +85,25 @@ impl AppView {
     fn add_creation_bar(&mut self, ui: &mut Ui) {
         ui.horizontal(|ui| {
             let width = ui.available_width();
-            let input_line = TextEdit::singleline(&mut self.todo_handler.new_todo_title)
+            let input_line = TextEdit::singleline(&mut self.todo_cache.new_title)
                 .desired_width(width)
                 .hint_text("Create new TODO");
             let response = ui.add(input_line);
 
             if response.lost_focus() && ui.input(|i| i.key_pressed(Key::Enter)) {
-                let title = self.todo_handler.new_todo_title.clone();
+                let title = self.todo_cache.new_title.clone();
                 self.todo_handler
                     .pipeline
                     .push(CreateUsingTitle(title.clone()));
 
-                self.todo_handler.new_todo_title.clear();
+                self.todo_cache.new_title.clear();
                 println!("Created new todo with name: {}", title);
             }
         });
     }
 
     fn list_todos(&mut self, ui: &mut Ui) {
-        for item in self.todo_handler.cache.iter_mut() {
+        for item in self.todo_cache.items.iter_mut() {
             ui.add_space(5.);
 
             ui.horizontal(|ui| {
@@ -132,5 +136,12 @@ impl AppView {
         egui::TopBottomPanel::bottom("Footer").show(ctx, |ui| {
             ui.add_space(5.);
         });
+    }
+
+    fn process_pipeline(&mut self) {
+        let update = self.todo_handler.pipeline.execute();
+        if update {
+            self.todo_cache.items = self.model.todos().get_all();
+        }
     }
 }
