@@ -32,7 +32,7 @@ impl eframe::App for AppView {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         self.process_pipeline();
         self.create_header(ctx);
-        self.create_vertical_layout(ctx);
+        self.create_central_layout(ctx);
         self.create_footer(ctx);
     }
 
@@ -67,38 +67,20 @@ impl AppView {
         });
     }
 
-    fn create_vertical_layout(&mut self, ctx: &egui::Context) {
+    fn create_central_layout(&mut self, ctx: &egui::Context) {
         egui::CentralPanel::default().show(ctx, |ui| {
-            egui::ScrollArea::vertical().show(ui, |ui| {
-                ui.vertical(|ui| {
-                    self.list_todos(ui);
-                });
-            });
-
-            ui.with_layout(Layout::bottom_up(Align::BOTTOM), |ui| {
-                ui.add_space(20.);
-                self.add_creation_bar(ui);
-            });
+            self.todo_main_view(ui);
         });
     }
 
-    fn add_creation_bar(&mut self, ui: &mut Ui) {
-        ui.horizontal(|ui| {
-            let width = ui.available_width();
-            let input_line = TextEdit::singleline(&mut self.todo_cache.new_title)
-                .desired_width(width)
-                .hint_text("Create new TODO");
-            let response = ui.add(input_line);
-
-            if response.lost_focus() && ui.input(|i| i.key_pressed(Key::Enter)) {
-                let title = self.todo_cache.new_title.clone();
-                self.todo_handler
-                    .pipeline
-                    .push(CreateUsingTitle(title.clone()));
-
-                self.todo_cache.new_title.clear();
-                println!("Created new todo with name: {}", title);
-            }
+    fn todo_main_view(&mut self, ui: &mut Ui) {
+        ui.vertical(|ui| {
+            egui::ScrollArea::vertical().show(ui, |ui| {
+                ui.vertical(|ui| {
+                    self.list_todos(ui);
+                    ui.add_space(20.);
+                });
+            });
         });
     }
 
@@ -111,7 +93,7 @@ impl AppView {
                     let check_btn = Checkbox::without_text(&mut item.completed);
                     let check_btn_respose = ui.add(check_btn);
                     if check_btn_respose.clicked() {
-                        self.todo_handler.pipeline.push(Delete(item.clone()));
+                        self.todo_handler.push_command(Delete(item.clone()));
                         println!("Clicked check box: {}", item.title);
                     }
 
@@ -132,14 +114,37 @@ impl AppView {
         }
     }
 
+    fn add_todo_creation_bar(&mut self, ui: &mut Ui) {
+        ui.horizontal(|ui| {
+            let width = ui.available_width();
+            let input_line = TextEdit::singleline(&mut self.todo_cache.new_title)
+                .desired_width(width)
+                .hint_text("New todo");
+            let response = ui.add(input_line);
+
+            if response.lost_focus() && ui.input(|i| i.key_pressed(Key::Enter)) {
+                let title = self.todo_cache.new_title.clone();
+                self.todo_handler
+                    .push_command(CreateUsingTitle(title.clone()));
+
+                self.todo_cache.new_title.clear();
+                println!("Created new todo with name: {}", title);
+            }
+        });
+    }
+
     fn create_footer(&mut self, ctx: &egui::Context) {
         egui::TopBottomPanel::bottom("Footer").show(ctx, |ui| {
-            ui.add_space(5.);
+            ui.vertical(|ui| {
+                ui.add_space(5.);
+                self.add_todo_creation_bar(ui);
+                ui.add_space(2.);
+            });
         });
     }
 
     fn process_pipeline(&mut self) {
-        let update = self.todo_handler.pipeline.execute();
+        let update = self.todo_handler.execute_pipeline();
         if update {
             self.todo_cache.items = self.model.todos().get_all();
         }

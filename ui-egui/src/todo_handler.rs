@@ -7,7 +7,7 @@ use crate::todo_pipeline::*;
 #[derive(Debug, Clone)]
 pub struct TodoViewHandler {
     dao: DaoRef<TodoDTO>,
-    pub pipeline: Box<TodoPipeline>,
+    pipeline: Box<TodoPipeline>,
 }
 
 pub fn create_todo_handler(todo_dao: DaoRef<TodoDTO>) -> Box<TodoViewHandler> {
@@ -17,4 +17,14 @@ pub fn create_todo_handler(todo_dao: DaoRef<TodoDTO>) -> Box<TodoViewHandler> {
     let handler = TodoViewHandler { dao, pipeline };
 
     Box::new(handler)
+}
+
+impl TodoViewHandler {
+    pub fn push_command(&mut self, cmd: PipelineCommand) {
+        self.pipeline.push(cmd);
+    }
+
+    pub fn execute_pipeline(&mut self) -> bool {
+        self.pipeline.execute()
+    }
 }
