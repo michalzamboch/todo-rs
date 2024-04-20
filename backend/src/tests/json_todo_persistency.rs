@@ -2,8 +2,7 @@
 
 use std::{error::Error, fs, result};
 
-use types::enums::todo_type::TodoType;
-
+use crate::types::enums::todo_type::*;
 use crate::{todo_dto::*, todo_persistency_json::*};
 
 const TEST_ID: u32 = 0;

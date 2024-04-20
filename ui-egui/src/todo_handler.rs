@@ -1,7 +1,6 @@
 #![allow(dead_code)]
 
-use backend::todo_dto::*;
-use types::traits::dao::*;
+use backend::{todo_dto::*, types::traits::dao::*};
 
 use crate::pipeline::*;
 

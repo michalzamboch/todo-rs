@@ -1,6 +1,6 @@
 #![allow(dead_code, unused_imports)]
 
-use types::enums::todo_type::TodoType;
+use crate::types::enums::todo_type::*;
 
 use crate::todo_dto::*;
 
@@ -12,9 +12,9 @@ fn create_todo() {
     let todo = TodoDTO::new(TEST_ID, TEST_TITLE);
 
     assert_eq!(todo.id(), TEST_ID);
-    assert_eq!(todo.title(), TEST_TITLE);
-    assert_eq!(todo.todo_type(), TodoType::Generic);
-    assert_eq!(todo.completed(), false);
+    assert_eq!(todo.title, TEST_TITLE);
+    assert_eq!(todo.todo_type, TodoType::Generic);
+    assert_eq!(todo.completed, false);
 }
 
 #[test]
@@ -40,7 +40,7 @@ fn update_equal_todos() {
 
     let result = todo.update_from_equal(other.clone());
     assert!(result.is_ok());
-    assert_eq!(todo.title(), other.title());
+    assert_eq!(todo.title, other.title);
 }
 
 #[test]

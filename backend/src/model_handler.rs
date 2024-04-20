@@ -4,7 +4,7 @@ use std::rc::Rc;
 
 use super::todo_dao::*;
 use super::todo_dto::*;
-use types::traits::dao::*;
+use crate::types::traits::dao::*;
 
 #[derive(Debug, Clone)]
 pub struct ModelHandler {

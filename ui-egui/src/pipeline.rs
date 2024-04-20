@@ -3,7 +3,7 @@
 use std::collections::*;
 
 use backend::todo_dto::*;
-use types::traits::dao::*;
+use backend::types::traits::dao::*;
 
 #[derive(Debug, Default, Clone, Hash, PartialEq, Eq)]
 pub enum PipelineCommand {

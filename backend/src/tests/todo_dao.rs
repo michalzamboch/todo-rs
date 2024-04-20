@@ -2,8 +2,8 @@
 
 use test_case::test_case;
 
-use types::enums::todo_type::TodoType;
-use types::traits::dao::*;
+use crate::types::enums::todo_type::*;
+use crate::types::traits::dao::*;
 
 use crate::todo_dao::*;
 use crate::todo_dto::*;
@@ -79,13 +79,13 @@ fn update_existing_row() {
     todo_dao.insert_row(&todo).expect("Unable to insert row.");
 
     let new_title = "New title";
-    todo.set_title(new_title);
+    todo.title = new_title.to_owned();
 
     let updated = todo_dao.update_row(&todo);
     assert!(updated.is_ok());
 
     let updated_row = todo_dao.select_by(TEST_ID);
-    assert!(updated_row.is_some_and(|item| item.title() == new_title));
+    assert!(updated_row.is_some_and(|item| item.title == new_title));
 }
 
 #[test]

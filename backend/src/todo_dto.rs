@@ -4,7 +4,8 @@ use std::error::Error;
 use std::fmt;
 
 use ::serde::*;
-use types::enums::todo_type::*;
+
+use crate::types::enums::todo_type::*;
 
 #[derive(Debug, Default, Clone, Hash, PartialEq, Eq, Serialize, Deserialize)]
 pub struct TodoDTO {

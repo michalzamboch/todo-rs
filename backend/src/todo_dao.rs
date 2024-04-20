@@ -2,8 +2,13 @@
 
 use std::{cell::RefCell, cmp::*, error::Error, ops::Deref, rc::Rc};
 
-use crate::{paths::*, todo_dto::*, todo_persistency_dummy::*, todo_persistency_json::*};
-use types::traits::{dao::IDao, persistency::IPeristency};
+use crate::{
+    paths::*,
+    todo_dto::*,
+    todo_persistency_dummy::*,
+    todo_persistency_json::*,
+    types::traits::{dao::IDao, persistency::IPeristency},
+};
 
 #[derive(Debug)]
 struct TodoDAO {

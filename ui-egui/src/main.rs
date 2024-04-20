@@ -10,7 +10,7 @@ fn main() -> Result<(), eframe::Error> {
     run()
 }
 
-pub fn run() -> Result<(), eframe::Error> {
+fn run() -> Result<(), eframe::Error> {
     env_logger::init(); // Log to stderr (if you run with `RUST_LOG=debug`).
 
     let options = eframe::NativeOptions {

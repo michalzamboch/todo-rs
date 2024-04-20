@@ -1,7 +1,7 @@
 #![allow(dead_code, unused_variables)]
 
 use crate::todo_dto::*;
-use types::traits::persistency::*;
+use crate::types::traits::persistency::*;
 
 use std::error::Error;
 

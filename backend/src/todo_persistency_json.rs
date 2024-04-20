@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 
-use types::traits::persistency::*;
+use crate::types::traits::persistency::*;
 
 use crate::todo_dto::TodoDTO;
 
