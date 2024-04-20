@@ -1,13 +1,11 @@
+#![allow(dead_code)]
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
 
-use crate::pipeline::PipelineCommand::*;
-use backend::{model_handler::*, todo_dto::*};
-use eframe::egui::{self, *};
+use crate::{pipeline::PipelineCommand::*, todo_handler::*};
+use crate::constants::*;
 
-use crate::{
-    constants::*,
-    pipeline::{create_todo_pipeline, TodoPipeline},
-};
+use backend::model_handler::*;
+use eframe::egui::{self, *};
 
 pub fn run() -> Result<(), eframe::Error> {
     env_logger::init(); // Log to stderr (if you run with `RUST_LOG=debug`).
@@ -32,13 +30,11 @@ pub fn run() -> Result<(), eframe::Error> {
 
 fn create_filled_view() -> Box<AppView> {
     let model = create_new_handler();
-    let todos = model.todos().get_all();
-    let todo_pipeline = create_todo_pipeline(model.todos());
+    let todo_handler = create_todo_handler(model.todos());
 
     let app_view = AppView {
         model,
-        todos,
-        todo_pipeline,
+        todo_handler,
     };
 
     Box::new(app_view)
@@ -47,8 +43,7 @@ fn create_filled_view() -> Box<AppView> {
 #[derive(Debug)]
 struct AppView {
     model: Box<ModelHandler>,
-    todos: Vec<TodoDTO>,
-    todo_pipeline: Box<TodoPipeline>,
+    todo_handler: Box<TodoViewHandler>,
 }
 
 impl AppView {
@@ -67,7 +62,7 @@ impl AppView {
         egui::CentralPanel::default().show(ctx, |ui| {
             egui::ScrollArea::vertical().show(ui, |ui| {
                 ui.vertical(|ui| {
-                    for item in self.todos.iter_mut() {
+                    for item in self.todo_handler.cache.iter_mut() {
                         ui.add_space(5.);
 
                         ui.horizontal(|ui| {
@@ -75,7 +70,7 @@ impl AppView {
                                 let check_btn = Checkbox::without_text(&mut item.completed);
                                 let check_btn_respose = ui.add(check_btn);
                                 if check_btn_respose.clicked() {
-                                    self.todo_pipeline.push(Delete(item.clone()));
+                                    self.todo_handler.pipeline.push(Delete(item.clone()));
                                     println!("Clicked check box: {}", item.title);
                                 }
 
@@ -109,10 +104,7 @@ impl AppView {
 
 impl eframe::App for AppView {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-        let update = self.todo_pipeline.execute();
-        if update {
-            self.todos = self.model.todos().get_all();
-        }
+        self.todo_handler.update();
         self.create_header(ctx);
         self.create_vertical_layout(ctx);
         self.create_footer(ctx);

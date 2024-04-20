@@ -6,7 +6,7 @@ use super::todo_dao::*;
 use super::todo_dto::*;
 use types::traits::dao::*;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ModelHandler {
     todos: DaoRef<TodoDTO>,
 }
