@@ -3,6 +3,30 @@ mod constants;
 mod pipeline;
 mod todo_handler;
 
+use crate::constants::*;
+use eframe::egui;
+
 fn main() -> Result<(), eframe::Error> {
-    bootstrap::run()
+    run()
+}
+
+pub fn run() -> Result<(), eframe::Error> {
+    env_logger::init(); // Log to stderr (if you run with `RUST_LOG=debug`).
+
+    let options = eframe::NativeOptions {
+        viewport: egui::ViewportBuilder::default()
+            .with_inner_size(DEFAULT_WINDOW_SIZE)
+            .with_min_inner_size(DEFAULT_WINDOW_SIZE),
+        ..Default::default()
+    };
+
+    eframe::run_native(
+        "Todo-rs",
+        options,
+        Box::new(|cc| {
+            egui_extras::install_image_loaders(&cc.egui_ctx);
+
+            bootstrap::create_filled_view()
+        }),
+    )
 }
