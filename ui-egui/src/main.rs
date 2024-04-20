@@ -1,6 +1,6 @@
 mod bootstrap;
 mod constants;
-mod pipeline;
+mod todo_pipeline;
 mod todo_handler;
 
 use crate::constants::*;

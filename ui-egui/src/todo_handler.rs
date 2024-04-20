@@ -2,13 +2,15 @@
 
 use backend::{todo_dto::*, types::traits::dao::*};
 
-use crate::pipeline::*;
+use crate::todo_pipeline::*;
 
 #[derive(Debug, Clone)]
 pub struct TodoViewHandler {
     dao: DaoRef<TodoDTO>,
     pub pipeline: Box<TodoPipeline>,
     pub cache: Vec<TodoDTO>,
+    pub current_todo: Option<TodoDTO>,
+    pub new_todo_title: String,
 }
 
 pub fn create_todo_handler(todo_dao: DaoRef<TodoDTO>) -> Box<TodoViewHandler> {
@@ -20,6 +22,8 @@ pub fn create_todo_handler(todo_dao: DaoRef<TodoDTO>) -> Box<TodoViewHandler> {
         dao,
         pipeline,
         cache: todos,
+        current_todo: None,
+        new_todo_title: "".to_owned(),
     };
 
     Box::new(handler)

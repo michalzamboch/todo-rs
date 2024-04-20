@@ -11,6 +11,7 @@ pub enum PipelineCommand {
     None,
     Delete(TodoDTO),
     Create(TodoDTO),
+    CreateUsingTitle(String),
     Update(TodoDTO),
 }
 
@@ -56,6 +57,12 @@ impl TodoPipeline {
             }
             PipelineCommand::Create(todo) => {
                 self.dao.insert_row(todo).expect("Unable to insert row");
+                true
+            }
+            PipelineCommand::CreateUsingTitle(title) => {
+                let id = self.dao.max_id() + 1;
+                let todo = TodoDTO::new(id, title);
+                self.dao.insert_row(&todo).expect("Unable to insert row");
                 true
             }
             PipelineCommand::Update(todo) => {

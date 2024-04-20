@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
 
-use crate::{pipeline::PipelineCommand::*, todo_handler::*};
+use crate::{todo_handler::*, todo_pipeline::PipelineCommand::*};
 
 use backend::model_handler::*;
 use eframe::egui::{self, *};
@@ -24,6 +24,33 @@ pub struct AppView {
     todo_handler: Box<TodoViewHandler>,
 }
 
+impl eframe::App for AppView {
+    fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+        self.todo_handler.update();
+        self.create_header(ctx);
+        self.create_vertical_layout(ctx);
+        self.create_footer(ctx);
+    }
+
+    fn save(&mut self, _storage: &mut dyn eframe::Storage) {}
+
+    fn on_exit(&mut self, _gl: Option<&eframe::glow::Context>) {
+        println!("Exit");
+    }
+
+    fn auto_save_interval(&self) -> std::time::Duration {
+        std::time::Duration::from_secs(30)
+    }
+
+    fn clear_color(&self, _visuals: &egui::Visuals) -> [f32; 4] {
+        egui::Color32::from_rgba_unmultiplied(12, 12, 12, 180).to_normalized_gamma_f32()
+    }
+
+    fn persist_egui_memory(&self) -> bool {
+        true
+    }
+}
+
 impl AppView {
     fn create_header(&mut self, ctx: &egui::Context) {
         egui::TopBottomPanel::top("Header").show(ctx, |ui| {
@@ -43,6 +70,31 @@ impl AppView {
                     self.list_todos(ui);
                 });
             });
+
+            ui.with_layout(Layout::bottom_up(Align::BOTTOM), |ui| {
+                ui.add_space(20.);
+                self.add_creation_bar(ui);
+            });
+        });
+    }
+
+    fn add_creation_bar(&mut self, ui: &mut Ui) {
+        ui.horizontal(|ui| {
+            let width = ui.available_width();
+            let input_line = TextEdit::singleline(&mut self.todo_handler.new_todo_title)
+                .desired_width(width)
+                .hint_text("Create new TODO");
+            let response = ui.add(input_line);
+
+            if response.lost_focus() && ui.input(|i| i.key_pressed(Key::Enter)) {
+                let title = self.todo_handler.new_todo_title.clone();
+                self.todo_handler
+                    .pipeline
+                    .push(CreateUsingTitle(title.clone()));
+
+                self.todo_handler.new_todo_title.clear();
+                println!("Created new todo with name: {}", title);
+            }
         });
     }
 
@@ -80,32 +132,5 @@ impl AppView {
         egui::TopBottomPanel::bottom("Footer").show(ctx, |ui| {
             ui.add_space(5.);
         });
-    }
-}
-
-impl eframe::App for AppView {
-    fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-        self.todo_handler.update();
-        self.create_header(ctx);
-        self.create_vertical_layout(ctx);
-        self.create_footer(ctx);
-    }
-
-    fn save(&mut self, _storage: &mut dyn eframe::Storage) {}
-
-    fn on_exit(&mut self, _gl: Option<&eframe::glow::Context>) {
-        println!("Exit");
-    }
-
-    fn auto_save_interval(&self) -> std::time::Duration {
-        std::time::Duration::from_secs(30)
-    }
-
-    fn clear_color(&self, _visuals: &egui::Visuals) -> [f32; 4] {
-        egui::Color32::from_rgba_unmultiplied(12, 12, 12, 180).to_normalized_gamma_f32()
-    }
-
-    fn persist_egui_memory(&self) -> bool {
-        true
     }
 }
