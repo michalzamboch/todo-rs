@@ -9,8 +9,7 @@ use eframe::egui::{self, *};
 pub fn create_filled_view() -> Box<AppView> {
     let model = create_new_handler();
     let todo_handler = create_todo_handler(model.todos());
-    let mut todo_cache = create_todo_cache();
-    todo_cache.items = model.todos().get_all();
+    let todo_cache = create_todo_cache();
 
     let app_view = AppView {
         model,

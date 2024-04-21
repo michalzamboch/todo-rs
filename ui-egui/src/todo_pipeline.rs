@@ -9,6 +9,7 @@ use backend::types::traits::dao::*;
 pub enum PipelineCommand {
     #[default]
     None,
+    Load,
     Delete(TodoDTO),
     Create(TodoDTO),
     CreateUsingTitle(String),
@@ -19,6 +20,12 @@ pub enum PipelineCommand {
 pub struct TodoPipeline {
     dao: DaoRef<TodoDTO>,
     commands: VecDeque<PipelineCommand>,
+}
+
+pub fn create_prepared_todo_pipeline(dao: DaoRef<TodoDTO>) -> Box<TodoPipeline> {
+    let mut pipeline = create_todo_pipeline(dao.clone());
+    pipeline.push(PipelineCommand::Load);
+    pipeline
 }
 
 pub fn create_todo_pipeline(dao: DaoRef<TodoDTO>) -> Box<TodoPipeline> {
@@ -49,6 +56,7 @@ impl TodoPipeline {
     fn execute_command(&self, cmd: &PipelineCommand) -> bool {
         match cmd {
             PipelineCommand::None => false,
+            PipelineCommand::Load => true,
             PipelineCommand::Delete(todo) => {
                 self.dao
                     .remove_row(todo.id())

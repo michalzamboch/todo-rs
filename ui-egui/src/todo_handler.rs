@@ -12,7 +12,7 @@ pub struct TodoViewHandler {
 
 pub fn create_todo_handler(todo_dao: DaoRef<TodoDTO>) -> Box<TodoViewHandler> {
     let dao = todo_dao.clone();
-    let pipeline = create_todo_pipeline(dao.clone());
+    let pipeline = create_prepared_todo_pipeline(dao.clone());
 
     let handler = TodoViewHandler { dao, pipeline };
 
