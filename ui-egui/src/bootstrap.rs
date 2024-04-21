@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
 
-use crate::{constants::*, todo_ui::*};
+use crate::{constants::*, todo::todo_ui::*};
 
 use backend::model_handler::*;
 use eframe::egui;

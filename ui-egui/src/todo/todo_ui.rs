@@ -1,7 +1,7 @@
-use crate::{todo_cache::*, todo_handler::*, todo_pipeline::PipelineCommand::*};
-
 use backend::{todo_dto::*, types::traits::dao::*};
 use eframe::egui::{self, *};
+
+use super::{todo_cache::*, todo_handler::*, todo_pipeline::PipelineCommand::*};
 
 #[derive(Debug)]
 pub struct TodoView {

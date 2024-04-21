@@ -2,7 +2,7 @@
 
 use backend::{todo_dto::*, types::traits::dao::*};
 
-use crate::todo_pipeline::*;
+use super::todo_pipeline::*;
 
 #[derive(Debug, Clone)]
 pub struct TodoViewHandler {
