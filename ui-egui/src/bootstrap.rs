@@ -99,7 +99,8 @@ impl AppView {
                     let title = Button::new(item.title.clone()).wrap(true).frame(false);
                     let title_response = ui.add(title);
                     if title_response.clicked() {
-                        println!("Clicked label: {}", item.title);
+                        self.todo_cache.current = Some(item.clone());
+                        println!("Clicked label: {}", item);
                     }
                 });
 
