@@ -1,4 +1,4 @@
-use backend::{todo_dto::*, types::traits::dao::*};
+use backend::{todo_dto::*, todo_filter::*, types::traits::dao::*};
 use eframe::egui::{self, *};
 
 use super::{todo_cache::*, todo_handler::*, todo_pipeline::PipelineCommand::*};
@@ -52,21 +52,24 @@ impl TodoView {
         ui.vertical(|ui| {
             egui::ScrollArea::vertical().show(ui, |ui| {
                 ui.vertical(|ui| {
-                    self.list_todos(ui);
+                    self.list_undone_todos(ui);
                 });
-                ui.collapsing("Done", |ui| {
-                    ui.vertical(|ui| {
-                        //self.list_todos(ui);
+
+                if !self.todo_cache.done.is_empty() {
+                    ui.collapsing("Done", |ui| {
+                        ui.vertical(|ui| {
+                            self.list_done_todos(ui);
+                        });
                     });
-                });
+                }
 
                 ui.add_space(30.);
             });
         });
     }
 
-    fn list_todos(&mut self, ui: &mut Ui) {
-        for item in self.todo_cache.items.iter_mut() {
+    fn list_undone_todos(&mut self, ui: &mut Ui) {
+        for item in self.todo_cache.undone.iter_mut() {
             ui.add_space(5.);
 
             ui.horizontal(|ui| {
@@ -74,7 +77,7 @@ impl TodoView {
                     let check_btn = Checkbox::without_text(&mut item.completed);
                     let check_btn_respose = ui.add(check_btn);
                     if check_btn_respose.clicked() {
-                        self.todo_handler.push_command(Delete(item.clone()));
+                        self.todo_handler.push_command(Update(item.clone()));
                         println!("Clicked check box: {}", item.title);
                     }
 
@@ -89,6 +92,28 @@ impl TodoView {
                 ui.with_layout(Layout::right_to_left(Align::RIGHT), |ui| {
                     let label = Label::new("1.1.2024".to_owned());
                     ui.add(label);
+                });
+            });
+
+            ui.separator();
+        }
+    }
+
+    fn list_done_todos(&mut self, ui: &mut Ui) {
+        for item in self.todo_cache.done.iter_mut() {
+            ui.add_space(5.);
+
+            ui.horizontal(|ui| {
+                ui.with_layout(Layout::left_to_right(Align::LEFT), |ui| {
+                    let check_btn = Checkbox::without_text(&mut item.completed);
+                    let check_btn_respose = ui.add(check_btn);
+                    if check_btn_respose.clicked() {
+                        self.todo_handler.push_command(Update(item.clone()));
+                        println!("Clicked check box: {}", item.title);
+                    }
+
+                    let title = Button::new(item.title.clone()).wrap(true).frame(false);
+                    let _ = ui.add(title);
                 });
             });
 
@@ -128,7 +153,10 @@ impl TodoView {
     fn process_pipeline(&mut self) {
         let update = self.todo_handler.execute_pipeline();
         if update {
-            self.todo_cache.items = self.dao.get_all();
+            let all_todos = self.dao.get_all();
+            let divided = split_done_undone(&all_todos);
+            self.todo_cache.done = divided.0;
+            self.todo_cache.undone = divided.1;
         }
     }
 }

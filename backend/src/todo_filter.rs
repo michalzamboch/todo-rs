@@ -1,11 +1,47 @@
+#![allow(dead_code)]
+
 use ::serde::*;
 use std::fmt;
 
+use crate::todo_dto::*;
+
 #[derive(Debug, Default, Clone, Hash, PartialEq, Eq, Serialize, Deserialize)]
 pub struct FilterTodosBy {
-    pub id_range: Option<(u32, u32)>,
-    pub title: Option<String>,
-    pub completed: Option<bool>,
+    id_range: Option<(u32, u32)>,
+    title: Option<String>,
+    completed: Option<bool>,
+}
+
+impl FilterTodosBy {
+    pub fn filter(&self, todos: Vec<TodoDTO>) -> Vec<TodoDTO> {
+        let mut result: Vec<TodoDTO> = vec![];
+
+        if let Some(x) = self.id_range {
+            let mut tmp: Vec<TodoDTO> = todos
+                .iter()
+                .filter(|&i| i.id() >= x.0 && i.id() <= x.1)
+                .cloned()
+                .collect();
+            result.append(&mut tmp);
+        }
+
+        result
+    }
+
+    pub fn id_range(mut self, range: (u32, u32)) -> Self {
+        self.id_range = Some(range);
+        self
+    }
+
+    pub fn title(mut self, title: &str) -> Self {
+        self.title = Some(title.to_owned());
+        self
+    }
+
+    pub fn completed(mut self, completed: bool) -> Self {
+        self.completed = Some(completed);
+        self
+    }
 }
 
 impl fmt::Display for FilterTodosBy {
@@ -30,33 +66,6 @@ impl fmt::Display for FilterTodosBy {
     }
 }
 
-#[derive(Debug, Default, Clone, Hash, PartialEq, Eq, Serialize, Deserialize)]
-pub struct TodoFilterBuilder {
-    filter_by: FilterTodosBy,
-}
-
-impl TodoFilterBuilder {
-    pub fn new() -> Self {
-        Self {
-            filter_by: FilterTodosBy::default(),
-        }
-    }
-    pub fn id_range(mut self, range: (u32, u32)) -> TodoFilterBuilder {
-        self.filter_by.id_range = Some(range);
-        self
-    }
-
-    pub fn title(mut self, title: &str) -> TodoFilterBuilder {
-        self.filter_by.title = Some(title.to_owned());
-        self
-    }
-
-    pub fn completed(mut self, completed: bool) -> TodoFilterBuilder {
-        self.filter_by.completed = Some(completed);
-        self
-    }
-
-    pub fn build(&self) -> FilterTodosBy {
-        self.filter_by.clone()
-    }
+pub fn split_done_undone(todos: &[TodoDTO]) -> (Vec<TodoDTO>, Vec<TodoDTO>) {
+    todos.iter().cloned().partition(|i| i.completed)
 }
