@@ -114,6 +114,16 @@ impl TodoView {
 
                     let title = Button::new(item.title.clone()).wrap(true).frame(false);
                     let _ = ui.add(title);
+
+                    ui.with_layout(Layout::right_to_left(Align::RIGHT), |ui| {
+                        ui.add_space(5.);
+
+                        let remove_btn = Button::new("❌").frame(false);
+                        let response = ui.add(remove_btn);
+                        if response.clicked() {
+                            self.todo_handler.push_command(Delete(item.clone()));
+                        }
+                    });
                 });
             });
 

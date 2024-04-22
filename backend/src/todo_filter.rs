@@ -13,7 +13,13 @@ pub struct FilterTodosBy {
 }
 
 impl FilterTodosBy {
-    pub fn filter(&self, todos: Vec<TodoDTO>) -> Vec<TodoDTO> {
+    pub fn new() -> Self {
+        FilterTodosBy {
+            ..Default::default()
+        }
+    }
+
+    pub fn filter(&self, todos: &[TodoDTO]) -> Vec<TodoDTO> {
         let mut result: Vec<TodoDTO> = vec![];
 
         if let Some(x) = self.id_range {
@@ -29,7 +35,11 @@ impl FilterTodosBy {
     }
 
     pub fn id_range(mut self, range: (u32, u32)) -> Self {
-        self.id_range = Some(range);
+        if range.0 > range.1 {
+            self.id_range = None;
+        } else {
+            self.id_range = Some(range);
+        }
         self
     }
 
