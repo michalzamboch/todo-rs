@@ -53,8 +53,14 @@ impl TodoView {
             egui::ScrollArea::vertical().show(ui, |ui| {
                 ui.vertical(|ui| {
                     self.list_todos(ui);
-                    ui.add_space(20.);
                 });
+                ui.collapsing("Done", |ui| {
+                    ui.vertical(|ui| {
+                        //self.list_todos(ui);
+                    });
+                });
+
+                ui.add_space(30.);
             });
         });
     }
