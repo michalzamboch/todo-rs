@@ -1,6 +1,5 @@
 #![allow(dead_code, unused_imports)]
 
-use crate::types::enums::todo_type::*;
 
 use crate::todo_dto::*;
 
@@ -13,8 +12,6 @@ fn create_todo() {
 
     assert_eq!(todo.id(), TEST_ID);
     assert_eq!(todo.title, TEST_TITLE);
-    assert_eq!(todo.todo_type, TodoType::Generic);
-    assert_eq!(todo.completed, false);
 }
 
 #[test]

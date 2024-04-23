@@ -3,3 +3,4 @@ target/
 *.lock
 
 todo_persistency.json
+*test.json

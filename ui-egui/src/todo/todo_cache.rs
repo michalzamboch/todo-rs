@@ -2,7 +2,7 @@
 
 use backend::todo_dto::*;
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct TodoCache {
     pub undone: Vec<TodoDTO>,
     pub done: Vec<TodoDTO>,

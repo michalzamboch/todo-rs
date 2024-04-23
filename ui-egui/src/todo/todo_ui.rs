@@ -90,6 +90,8 @@ impl TodoView {
                 });
 
                 ui.with_layout(Layout::right_to_left(Align::RIGHT), |ui| {
+                    ui.add_space(10.);
+
                     let label = Label::new("1.1.2024".to_owned());
                     ui.add(label);
                 });
@@ -116,7 +118,7 @@ impl TodoView {
                     let _ = ui.add(title);
 
                     ui.with_layout(Layout::right_to_left(Align::RIGHT), |ui| {
-                        ui.add_space(5.);
+                        ui.add_space(10.);
 
                         let remove_btn = Button::new("❌").frame(false);
                         let response = ui.add(remove_btn);
@@ -163,10 +165,14 @@ impl TodoView {
     fn process_pipeline(&mut self) {
         let update = self.todo_handler.execute_pipeline();
         if update {
-            let all_todos = self.dao.get_all();
-            let divided = split_done_undone(&all_todos);
-            self.todo_cache.done = divided.0;
-            self.todo_cache.undone = divided.1;
+            self.data_update();
         }
+    }
+
+    fn data_update(&mut self) {
+        let all_todos = self.dao.get_all();
+        let divided = split_done_undone(&all_todos);
+        self.todo_cache.done = divided.0;
+        self.todo_cache.undone = divided.1;
     }
 }

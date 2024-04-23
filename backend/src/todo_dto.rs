@@ -3,14 +3,11 @@ use std::fmt;
 
 use ::serde::*;
 
-use crate::types::enums::todo_type::*;
-
 #[derive(Debug, Default, Clone, Hash, PartialEq, Eq, Serialize, Deserialize)]
 pub struct TodoDTO {
     id: u32,
     pub title: String,
     pub completed: bool,
-    pub todo_type: TodoType,
 }
 
 impl TodoDTO {
@@ -38,7 +35,6 @@ impl TodoDTO {
         self.id = other.id();
         self.title = other.title.to_owned();
         self.completed = other.completed;
-        self.todo_type = other.todo_type;
 
         Ok(())
     }
@@ -47,8 +43,8 @@ impl TodoDTO {
 impl fmt::Display for TodoDTO {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let result = format!(
-            "ID: {} title: {} completed: {} type: {}",
-            self.id, self.title, self.completed, self.todo_type
+            "ID: {} title: {} completed: {}",
+            self.id, self.title, self.completed
         );
         write!(f, "{}", result)
     }

@@ -2,7 +2,6 @@
 
 use test_case::test_case;
 
-use crate::types::enums::todo_type::*;
 use crate::types::traits::dao::*;
 
 use crate::todo_dao::*;

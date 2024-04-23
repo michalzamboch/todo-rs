@@ -2,7 +2,7 @@
 
 use std::{error::Error, fs, result};
 
-use crate::types::enums::todo_type::*;
+use crate::tests::todo_helpers::*;
 use crate::{todo_dto::*, todo_persistency_json::*};
 
 const TEST_ID: u32 = 0;
@@ -18,9 +18,17 @@ fn load_data() {
     assert_eq!(result.unwrap().len(), 3);
 }
 
-fn compare_files(file_path1: &str, file_path2: &str) -> Result<bool, Box<dyn Error>> {
-    let contents1 = fs::read(file_path1)?;
-    let contents2 = fs::read(file_path2)?;
+#[test]
+fn save_and_load() {
+    let path = "todo_test.json";
+    let persistency = create_todo_json_persistency(path);
+    let data: Vec<TodoDTO> = get_test_todos().into();
 
-    Ok(contents1 == contents2)
+    let save_result = persistency.save(&data);
+    assert!(save_result.is_ok());
+
+    let load_result = persistency.load();
+    assert!(load_result.is_ok());
+
+    assert_eq!(data, load_result.unwrap_or_default());
 }

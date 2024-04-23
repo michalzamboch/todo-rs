@@ -32,7 +32,7 @@ impl IPeristency<TodoDTO> for TodoPersistencyJson {
         Ok(result)
     }
 
-    fn save(&self, data: Vec<TodoDTO>) -> Result<(), Box<dyn Error>> {
+    fn save(&self, data: &[TodoDTO]) -> Result<(), Box<dyn Error>> {
         let file = File::create(self.filepath.as_str())?;
         let mut writer = BufWriter::new(file);
         serde_json::to_writer(&mut writer, &data)?;

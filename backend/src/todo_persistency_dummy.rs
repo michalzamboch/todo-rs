@@ -38,7 +38,7 @@ impl IPeristency<TodoDTO> for TodoPersistencyDummy {
         Ok(self.data.clone())
     }
 
-    fn save(&self, data: Vec<TodoDTO>) -> Result<(), Box<dyn Error>> {
+    fn save(&self, data: &[TodoDTO]) -> Result<(), Box<dyn Error>> {
         Ok(())
     }
 }
