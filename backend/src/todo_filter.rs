@@ -2,6 +2,7 @@
 
 use ::serde::*;
 use std::fmt;
+use rayon::prelude::*;
 
 use crate::todo_dto::*;
 
@@ -24,7 +25,7 @@ impl FilterTodosBy {
 
         if let Some(x) = self.id_range {
             result = result
-                .iter()
+                .par_iter()
                 .filter(|&i| i.id() >= x.0 && i.id() <= x.1)
                 .cloned()
                 .collect();
@@ -32,7 +33,7 @@ impl FilterTodosBy {
 
         if let Some(x) = self.completed {
             result = result
-                .iter()
+                .par_iter()
                 .filter(|&i| i.completed == x)
                 .cloned()
                 .collect();
@@ -40,7 +41,7 @@ impl FilterTodosBy {
 
         if let Some(x) = self.title.clone() {
             result = result
-                .iter()
+                .par_iter()
                 .filter(|&i| i.title.contains(x.as_str()))
                 .cloned()
                 .collect();
@@ -92,5 +93,5 @@ impl fmt::Display for FilterTodosBy {
 }
 
 pub fn split_done_undone(todos: &[TodoDTO]) -> (Vec<TodoDTO>, Vec<TodoDTO>) {
-    todos.iter().cloned().partition(|i| i.completed)
+    todos.par_iter().cloned().partition(|i| i.completed)
 }
