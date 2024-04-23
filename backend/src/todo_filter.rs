@@ -20,15 +20,30 @@ impl FilterTodosBy {
     }
 
     pub fn filter(&self, todos: &[TodoDTO]) -> Vec<TodoDTO> {
-        let mut result: Vec<TodoDTO> = vec![];
+        let mut result: Vec<TodoDTO> = todos.into();
 
         if let Some(x) = self.id_range {
-            let mut tmp: Vec<TodoDTO> = todos
+            result = result
                 .iter()
                 .filter(|&i| i.id() >= x.0 && i.id() <= x.1)
                 .cloned()
                 .collect();
-            result.append(&mut tmp);
+        }
+
+        if let Some(x) = self.completed {
+            result = result
+                .iter()
+                .filter(|&i| i.completed == x)
+                .cloned()
+                .collect();
+        }
+
+        if let Some(x) = self.title.clone() {
+            result = result
+                .iter()
+                .filter(|&i| i.title.contains(x.as_str()))
+                .cloned()
+                .collect();
         }
 
         result

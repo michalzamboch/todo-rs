@@ -4,6 +4,7 @@ use crate::todo_dto::*;
 
 pub fn get_test_todos() -> Box<[TodoDTO]> {
     let result: [TodoDTO; 12] = [
+        TodoDTO::new(0, "Learn Y"),
         TodoDTO::new(1, "Learn rust"),
         TodoDTO::new(2, "Learn egui"),
         TodoDTO::new(3, "Learn slint"),
@@ -14,8 +15,7 @@ pub fn get_test_todos() -> Box<[TodoDTO]> {
         TodoDTO::new(8, "Learn egui"),
         TodoDTO::new(9, "Learn slint"),
         TodoDTO::new(10, "Learn rust"),
-        TodoDTO::new(11, "Learn egui"),
-        TodoDTO::new(12, "Learn X"),
+        TodoDTO::new(11, "Learn X"),
     ];
     Box::new(result)
 }
