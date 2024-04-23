@@ -13,7 +13,7 @@ pub struct ModelHandler {
 
 pub fn create_new_handler() -> Box<ModelHandler> {
     let model = ModelHandler {
-        todos: TodoDAOFactory::create_filled_dummy_ref(),
+        todos: TodoDAOFactory::create(),
     };
 
     Box::new(model)

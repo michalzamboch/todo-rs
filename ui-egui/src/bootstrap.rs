@@ -1,10 +1,12 @@
 #![allow(dead_code)]
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
 
+use std::process::exit;
+
 use crate::{constants::*, todo::todo_ui::*};
 
 use backend::model_handler::*;
-use eframe::egui;
+use eframe::egui::{self, *};
 
 pub fn run() -> Result<(), eframe::Error> {
     env_logger::init(); // Log to stderr (if you run with `RUST_LOG=debug`).
@@ -44,6 +46,9 @@ struct AppView {
 
 impl eframe::App for AppView {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+        if ctx.input(|i| i.key_pressed(Key::Escape)) {
+            exit(0);
+        }
         self.todo_view.update(ctx);
     }
 

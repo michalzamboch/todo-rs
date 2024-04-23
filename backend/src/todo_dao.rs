@@ -36,28 +36,28 @@ impl TodoDAOFactory {
         }
     }
 
-    pub fn create_dummy_ref() -> Rc<Box<dyn IDao<TodoDTO>>> {
-        let dao = Self::create_empty_dummy();
+    pub fn create_empty_dummy() -> Rc<Box<dyn IDao<TodoDTO>>> {
+        let dao = Self::create_empty();
         let boxed_dao = Box::new(dao);
 
         Rc::new(boxed_dao)
     }
 
-    fn create_empty_dummy() -> TodoDAO {
+    fn create_empty() -> TodoDAO {
         TodoDAO {
             todos: RefCell::new(vec![]),
             persistency: create_todo_persistency_dummy(),
         }
     }
 
-    pub fn create_filled_dummy_ref() -> Rc<Box<dyn IDao<TodoDTO>>> {
-        let dao = Self::create_filled_dummy();
+    pub fn create_filled_dummy() -> Rc<Box<dyn IDao<TodoDTO>>> {
+        let dao = Self::create_filled();
         let boxed_dao = Box::new(dao);
 
         Rc::new(boxed_dao)
     }
 
-    fn create_filled_dummy() -> TodoDAO {
+    fn create_filled() -> TodoDAO {
         let persistency = create_todo_persistency_dummy();
         let loaded_todos = persistency.load().unwrap_or_default();
 
@@ -89,6 +89,7 @@ impl IDao<TodoDTO> for TodoDAO {
         }
 
         self.todos.borrow_mut().push(item.clone());
+        self.persistency.save(self.todos.borrow().as_ref())?;
         Ok(())
     }
 
@@ -97,6 +98,7 @@ impl IDao<TodoDTO> for TodoDAO {
         match found {
             Some(index) => {
                 self.todos.borrow_mut()[index].update_from_equal(item.clone())?;
+                self.persistency.save(self.todos.borrow().as_ref())?;
                 Ok(())
             }
             None => Err("Non existing id.".into()),
@@ -108,6 +110,7 @@ impl IDao<TodoDTO> for TodoDAO {
         match found {
             Some(index) => {
                 self.todos.borrow_mut().remove(index);
+                self.persistency.save(self.todos.borrow().as_ref())?;
                 Ok(())
             }
             None => Err("Non existing id.".into()),
