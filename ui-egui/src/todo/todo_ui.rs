@@ -46,11 +46,15 @@ impl TodoView {
     fn create_right_panel(&mut self, ctx: &Context) {
         let show = self.todo_cache.current_selected;
         if show {
-            egui::SidePanel::right("todo_detail").show(ctx, |ui| {
-                ui.vertical(|ui| {
-                    self.display_selected_todo(ui);
+            egui::SidePanel::right("todo_detail")
+                .max_width(400.)
+                .default_width(225.)
+                .resizable(true)
+                .show(ctx, |ui| {
+                    ui.vertical(|ui| {
+                        self.display_selected_todo(ui);
+                    });
                 });
-            });
         }
     }
 
@@ -65,13 +69,15 @@ impl TodoView {
         let curent = &mut self.todo_cache.current;
 
         ui.label("Title");
-        let title_edit = TextEdit::singleline(&mut curent.title);
-        let response = ui.add(title_edit);
+        ui.with_layout(Layout::top_down_justified(Align::Max), |ui| {
+            let title_edit = TextEdit::singleline(&mut curent.title);
+            let response = ui.add(title_edit);
 
-        if response.lost_focus() && ui.input(|i| i.key_pressed(Key::Enter)) {
-            let copy = curent.clone();
-            self.todo_handler.push_command(Update(copy));
-        }
+            if response.lost_focus() && ui.input(|i| i.key_pressed(Key::Enter)) {
+                let copy = curent.clone();
+                self.todo_handler.push_command(Update(copy));
+            }
+        });
     }
 
     fn create_description_edit(&mut self, ui: &mut Ui) {
