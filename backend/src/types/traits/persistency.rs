@@ -1,6 +1,12 @@
 use std::{error::Error, fmt::Debug};
 
+use serde::{de::DeserializeOwned, *};
+
 pub trait IPeristency<T>: Debug + Send {
-    fn load(&self) -> Result<Vec<T>, Box<dyn Error>>;
-    fn save(&self, data: &[T]) -> Result<(), Box<dyn Error>>;
+    fn load(&self) -> Result<Vec<T>, Box<dyn Error>>
+    where
+        T: DeserializeOwned;
+    fn save(&self, data: &[T]) -> Result<(), Box<dyn Error>>
+    where
+        T: Sized + Serialize;
 }

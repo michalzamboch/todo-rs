@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use backend::{todo_dto::*, todo_filter::*, types::traits::dao::*};
 use eframe::egui::{self, *};
 
@@ -65,6 +67,12 @@ impl TodoView {
         self.create_description_edit(ui);
     }
 
+    fn create_time_created(&mut self, ui: &mut Ui) {
+        let curent = &self.todo_cache.current;
+        ui.label("Created:");
+        ui.label(&curent.creation_time_fmt());
+    }
+    
     fn create_title_edit(&mut self, ui: &mut Ui) {
         let curent = &mut self.todo_cache.current;
 
@@ -128,13 +136,19 @@ impl TodoView {
                 ui.with_layout(Layout::left_to_right(Align::LEFT), |ui| {
                     let check_btn = Checkbox::without_text(&mut item.completed);
                     let check_btn_respose = ui.add(check_btn);
+
                     if check_btn_respose.clicked() {
+                        if item.equal_by_id(&self.todo_cache.current) {
+                            self.todo_cache.current_selected = false;
+                        }
+
                         self.todo_handler.push_command(Update(item.clone()));
                         println!("Clicked check box: {}", item.title);
                     }
 
                     let title = Button::new(item.title.clone()).wrap(true).frame(false);
                     let title_response = ui.add(title);
+
                     if title_response.clicked() {
                         self.todo_cache.current = item.clone();
                         self.todo_cache.current_selected = true;

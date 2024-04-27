@@ -38,6 +38,10 @@ impl TodoDTO {
         self.id() == other.id()
     }
 
+    pub fn creation_time_fmt(&self) -> String {
+        self.creation_time.format("%H:%M %Y-%m-%d").to_string()
+    }
+
     pub fn update_from_equal(&mut self, other: TodoDTO) -> Result<(), Box<dyn Error>> {
         if self.id() != other.id() {
             return Err("IDs are not equal.".into());
