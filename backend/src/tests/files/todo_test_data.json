@@ -1,1 +1,32 @@
-[{"id":1,"title":"Learn rust","completed":false,"todo_type":"Generic"},{"id":2,"title":"Learn egui","completed":false,"todo_type":"Generic"},{"id":3,"title":"Learn slint","completed":false,"todo_type":"Generic"}]
+[
+    {
+        "id": 1,
+        "folder_id": null,
+        "title": "x",
+        "description": "",
+        "completed": false,
+        "stared": false,
+        "creation_time": "2024-04-25T19:44:41.933571019+02:00",
+        "to_be_done_time": null
+    },
+    {
+        "id": 2,
+        "folder_id": null,
+        "title": "y",
+        "description": "",
+        "completed": false,
+        "stared": false,
+        "creation_time": "2024-04-25T19:44:43.750930110+02:00",
+        "to_be_done_time": null
+    },
+    {
+        "id": 3,
+        "folder_id": null,
+        "title": "z",
+        "description": "",
+        "completed": false,
+        "stared": false,
+        "creation_time": "2024-04-25T19:44:45.182825832+02:00",
+        "to_be_done_time": null
+    }
+]
