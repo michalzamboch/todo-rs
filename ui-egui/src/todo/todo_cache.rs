@@ -6,7 +6,8 @@ use backend::todo_dto::*;
 pub struct TodoCache {
     pub undone: Vec<TodoDTO>,
     pub done: Vec<TodoDTO>,
-    pub current: Option<TodoDTO>,
+    pub current: TodoDTO,
+    pub current_selected: bool,
     pub new_title: String,
 }
 
@@ -14,8 +15,8 @@ pub fn create_todo_cache() -> Box<TodoCache> {
     let handler = TodoCache {
         undone: vec![],
         done: vec![],
-        current: None,
         new_title: "".to_owned(),
+        ..Default::default()
     };
 
     Box::new(handler)

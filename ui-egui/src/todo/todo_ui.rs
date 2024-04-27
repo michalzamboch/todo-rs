@@ -27,6 +27,7 @@ impl TodoView {
     pub fn update(&mut self, ctx: &egui::Context) {
         self.process_pipeline();
         self.create_header(ctx);
+        self.create_right_panel(ctx);
         self.create_central_layout(ctx);
         self.create_footer(ctx);
     }
@@ -40,6 +41,51 @@ impl TodoView {
 
             ui.add_space(5.);
         });
+    }
+
+    fn create_right_panel(&mut self, ctx: &Context) {
+        let show = self.todo_cache.current_selected;
+        if show {
+            egui::SidePanel::right("todo_detail").show(ctx, |ui| {
+                ui.vertical(|ui| {
+                    self.display_selected_todo(ui);
+                });
+            });
+        }
+    }
+
+    fn display_selected_todo(&mut self, ui: &mut Ui) {
+        ui.add_space(5.);
+        self.create_title_edit(ui);
+        ui.add_space(5.);
+        self.create_description_edit(ui);
+    }
+
+    fn create_title_edit(&mut self, ui: &mut Ui) {
+        let curent = &mut self.todo_cache.current;
+
+        ui.label("Title");
+        let title_edit = TextEdit::singleline(&mut curent.title);
+        let response = ui.add(title_edit);
+
+        if response.lost_focus() && ui.input(|i| i.key_pressed(Key::Enter)) {
+            let copy = curent.clone();
+            self.todo_handler.push_command(Update(copy));
+        }
+    }
+
+    fn create_description_edit(&mut self, ui: &mut Ui) {
+        let curent = &mut self.todo_cache.current;
+
+        ui.label("Description");
+        let desc_edit =
+            TextEdit::multiline(&mut curent.description).hint_text("Set description...");
+        let response = ui.add_sized(ui.available_size(), desc_edit);
+
+        if response.lost_focus() {
+            let copy = curent.clone();
+            self.todo_handler.push_command(Update(copy));
+        }
     }
 
     fn create_central_layout(&mut self, ctx: &egui::Context) {
@@ -84,7 +130,8 @@ impl TodoView {
                     let title = Button::new(item.title.clone()).wrap(true).frame(false);
                     let title_response = ui.add(title);
                     if title_response.clicked() {
-                        self.todo_cache.current = Some(item.clone());
+                        self.todo_cache.current = item.clone();
+                        self.todo_cache.current_selected = true;
                         println!("Clicked label: {}", item);
                     }
                 });

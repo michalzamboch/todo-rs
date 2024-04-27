@@ -46,6 +46,10 @@ impl TodoDTO {
         self.id = other.id();
         self.title = other.title.to_owned();
         self.completed = other.completed;
+        self.description = other.description;
+        self.stared = other.stared;
+        self.creation_time = other.creation_time;
+        self.to_be_done_time = other.to_be_done_time;
 
         Ok(())
     }
