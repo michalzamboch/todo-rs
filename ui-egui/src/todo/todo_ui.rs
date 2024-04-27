@@ -152,7 +152,7 @@ impl TodoView {
                     ui.label("1.1.2024");
 
                     ui.with_layout(Layout::top_down_justified(egui::Align::LEFT), |ui| {
-                        let title = Button::new(item.title.clone()).wrap(true).frame(false);
+                        let title = Button::new(&item.title).wrap(true).frame(false);
                         let title_response = ui.add(title);
 
                         if title_response.clicked() {
@@ -181,7 +181,7 @@ impl TodoView {
                         println!("Clicked check box: {}", item.title);
                     }
 
-                    let title = Button::new(item.title.clone()).wrap(true).frame(false);
+                    let title = Button::new(&item.title).wrap(true).frame(false);
                     let _ = ui.add(title);
 
                     ui.with_layout(Layout::right_to_left(Align::RIGHT), |ui| {
