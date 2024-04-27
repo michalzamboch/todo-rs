@@ -72,7 +72,7 @@ impl TodoView {
         ui.label("Created:");
         ui.label(&curent.creation_time_fmt());
     }
-    
+
     fn create_title_edit(&mut self, ui: &mut Ui) {
         let curent = &mut self.todo_cache.current;
 
@@ -145,22 +145,22 @@ impl TodoView {
                         self.todo_handler.push_command(Update(item.clone()));
                         println!("Clicked check box: {}", item.title);
                     }
-
-                    let title = Button::new(item.title.clone()).wrap(true).frame(false);
-                    let title_response = ui.add(title);
-
-                    if title_response.clicked() {
-                        self.todo_cache.current = item.clone();
-                        self.todo_cache.current_selected = true;
-                        println!("Clicked label: {}", item);
-                    }
                 });
 
-                ui.with_layout(Layout::right_to_left(Align::RIGHT), |ui| {
+                ui.with_layout(Layout::right_to_left(Align::BOTTOM), |ui| {
                     ui.add_space(10.);
+                    ui.label("1.1.2024");
 
-                    let label = Label::new("1.1.2024".to_owned());
-                    ui.add(label);
+                    ui.with_layout(Layout::top_down_justified(egui::Align::LEFT), |ui| {
+                        let title = Button::new(item.title.clone()).wrap(true).frame(false);
+                        let title_response = ui.add(title);
+
+                        if title_response.clicked() {
+                            self.todo_cache.current = item.clone();
+                            self.todo_cache.current_selected = true;
+                            println!("Clicked label: {}", item);
+                        }
+                    });
                 });
             });
 
