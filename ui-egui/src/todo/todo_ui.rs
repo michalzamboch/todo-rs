@@ -195,6 +195,16 @@ impl TodoView {
         }
     }
 
+    fn create_footer(&mut self, ctx: &egui::Context) {
+        egui::TopBottomPanel::bottom("Footer").show(ctx, |ui| {
+            ui.vertical(|ui| {
+                ui.add_space(5.);
+                self.add_todo_creation_bar(ui);
+                ui.add_space(2.);
+            });
+        });
+    }
+
     fn add_todo_creation_bar(&mut self, ui: &mut Ui) {
         ui.horizontal(|ui| {
             let width = ui.available_width();
@@ -210,16 +220,6 @@ impl TodoView {
 
                 self.todo_cache.new_title.clear();
             }
-        });
-    }
-
-    fn create_footer(&mut self, ctx: &egui::Context) {
-        egui::TopBottomPanel::bottom("Footer").show(ctx, |ui| {
-            ui.vertical(|ui| {
-                ui.add_space(5.);
-                self.add_todo_creation_bar(ui);
-                ui.add_space(2.);
-            });
         });
     }
 
