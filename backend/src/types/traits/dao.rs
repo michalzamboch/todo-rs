@@ -1,4 +1,4 @@
-use std::{error::Error, fmt::Debug, rc::Rc};
+use std::{error::Error, fmt::Debug, sync::Arc};
 
 pub trait IDao<T>: Debug + Send {
     fn select_by(&self, id: u32) -> Option<T>;
@@ -13,4 +13,4 @@ pub trait IDao<T>: Debug + Send {
     fn exists(&self, id: u32) -> bool;
 }
 
-pub type DaoRef<T> = Rc<Box<dyn IDao<T>>>;
+pub type DaoRef<T> = Arc<Box<dyn IDao<T>>>;

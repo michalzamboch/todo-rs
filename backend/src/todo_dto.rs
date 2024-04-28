@@ -69,8 +69,8 @@ impl fmt::Display for TodoDTO {
             self.description,
             self.completed,
             self.stared,
-            self.creation_time.to_string(),
-            self.to_be_done_time.unwrap_or_default().to_string(),
+            self.creation_time,
+            self.to_be_done_time.unwrap_or_default(),
         );
         write!(f, "{}", result)
     }

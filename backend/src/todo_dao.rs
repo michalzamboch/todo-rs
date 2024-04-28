@@ -1,13 +1,13 @@
 #![allow(dead_code, unused_variables)]
 
-use std::{cell::RefCell, cmp::*, error::Error, ops::Deref, rc::Rc};
+use std::{cell::RefCell, cmp::*, error::Error, ops::Deref, sync::Arc};
 
 use crate::{
     paths::*,
     todo_dto::*,
     todo_persistency_dummy::*,
     todo_persistency_json::*,
-    types::traits::{dao::IDao, persistency::IPeristency},
+    types::traits::{dao::*, persistency::*},
 };
 
 #[derive(Debug)]
@@ -19,11 +19,11 @@ struct TodoDAO {
 pub struct TodoDAOFactory {}
 
 impl TodoDAOFactory {
-    pub fn create() -> Rc<Box<dyn IDao<TodoDTO>>> {
+    pub fn create() -> DaoRef<TodoDTO> {
         let dao = Self::create_loaded();
         let boxed_dao = Box::new(dao);
 
-        Rc::new(boxed_dao)
+        Arc::new(boxed_dao)
     }
 
     fn create_loaded() -> TodoDAO {
@@ -36,11 +36,11 @@ impl TodoDAOFactory {
         }
     }
 
-    pub fn create_empty_dummy() -> Rc<Box<dyn IDao<TodoDTO>>> {
+    pub fn create_empty_dummy() -> DaoRef<TodoDTO> {
         let dao = Self::create_empty();
         let boxed_dao = Box::new(dao);
 
-        Rc::new(boxed_dao)
+        Arc::new(boxed_dao)
     }
 
     fn create_empty() -> TodoDAO {
@@ -50,11 +50,11 @@ impl TodoDAOFactory {
         }
     }
 
-    pub fn create_filled_dummy() -> Rc<Box<dyn IDao<TodoDTO>>> {
+    pub fn create_filled_dummy() -> DaoRef<TodoDTO> {
         let dao = Self::create_filled();
         let boxed_dao = Box::new(dao);
 
-        Rc::new(boxed_dao)
+        Arc::new(boxed_dao)
     }
 
     fn create_filled() -> TodoDAO {

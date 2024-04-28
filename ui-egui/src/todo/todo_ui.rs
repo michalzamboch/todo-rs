@@ -237,3 +237,13 @@ impl TodoView {
         self.todo_cache.undone = divided.1;
     }
 }
+
+fn menu_bar(ui: &mut Ui) {
+    menu::bar(ui, |ui| {
+        ui.menu_button("File", |ui| {
+            if ui.button("Open").clicked() {
+                // …
+            }
+        });
+    });
+}
