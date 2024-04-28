@@ -4,10 +4,7 @@
 # for simplicity we are compiling and testing everything on the Ubuntu environment only.
 # For multi-OS testing see the `cross.yml` workflow.
 
-on:
-  push:
-    branches: ['master']
-    paths: ['backend/**']
+on: [push, pull_request]
 
 name: Quickstart
 
@@ -17,9 +14,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout sources
+        working-directory: ./backend
         uses: actions/checkout@v2
 
       - name: Install stable toolchain
+        working-directory: ./backend
         uses: actions-rs/toolchain@v1
         with:
           profile: minimal
@@ -27,6 +26,7 @@ jobs:
           override: true
 
       - name: Run cargo check
+        working-directory: ./backend
         uses: actions-rs/cargo@v1
         with:
           command: check
@@ -36,9 +36,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout sources
+        working-directory: ./backend
         uses: actions/checkout@v2
 
       - name: Install stable toolchain
+        working-directory: ./backend
         uses: actions-rs/toolchain@v1
         with:
           profile: minimal
@@ -46,6 +48,7 @@ jobs:
           override: true
 
       - name: Run cargo test
+        working-directory: ./backend
         uses: actions-rs/cargo@v1
         with:
           command: test
@@ -55,9 +58,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout sources
+        working-directory: ./backend
         uses: actions/checkout@v2
 
       - name: Install stable toolchain
+        working-directory: ./backend
         uses: actions-rs/toolchain@v1
         with:
           profile: minimal
@@ -66,12 +71,14 @@ jobs:
           components: rustfmt, clippy
 
       - name: Run cargo fmt
+        working-directory: ./backend
         uses: actions-rs/cargo@v1
         with:
           command: fmt
           args: --all -- --check
 
       - name: Run cargo clippy
+        working-directory: ./backend
         uses: actions-rs/cargo@v1
         with:
           command: clippy
