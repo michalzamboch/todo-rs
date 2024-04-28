@@ -111,15 +111,11 @@ impl TodoView {
     fn todo_main_view(&mut self, ui: &mut Ui) {
         ui.vertical(|ui| {
             egui::ScrollArea::vertical().show(ui, |ui| {
-                ui.vertical(|ui| {
-                    self.list_undone_todos(ui);
-                });
+                self.list_undone_todos(ui);
 
                 if !self.todo_cache.done.is_empty() {
                     ui.collapsing("Done", |ui| {
-                        ui.vertical(|ui| {
-                            self.list_done_todos(ui);
-                        });
+                        self.list_done_todos(ui);
                     });
                 }
 
@@ -181,8 +177,7 @@ impl TodoView {
                         println!("Clicked check box: {}", item.title);
                     }
 
-                    let title = Button::new(&item.title).wrap(true).frame(false);
-                    let _ = ui.add(title);
+                    ui.label(&item.title);
 
                     ui.with_layout(Layout::right_to_left(Align::RIGHT), |ui| {
                         ui.add_space(10.);
@@ -214,7 +209,6 @@ impl TodoView {
                     .push_command(CreateUsingTitle(title.clone()));
 
                 self.todo_cache.new_title.clear();
-                println!("Created new todo with name: {}", title);
             }
         });
     }

@@ -58,25 +58,56 @@ impl TodoPipeline {
             PipelineCommand::None => false,
             PipelineCommand::Load => true,
             PipelineCommand::Delete(todo) => {
-                self.dao
-                    .remove_row(todo.id())
-                    .expect("Unable to remove row");
+                self.remove_action(todo);
                 true
             }
             PipelineCommand::Create(todo) => {
-                self.dao.insert_row(todo).expect("Unable to insert row");
+                self.create_action(todo);
                 true
             }
             PipelineCommand::CreateUsingTitle(title) => {
-                let id = self.dao.max_id() + 1;
-                let todo = TodoDTO::new(id, title);
-                self.dao.insert_row(&todo).expect("Unable to insert row");
+                self.create_using_title_action(title);
                 true
             }
             PipelineCommand::Update(todo) => {
-                self.dao.update_row(todo).expect("Unable to update row");
+                self.update_action(todo);
                 true
             }
+        }
+    }
+
+    fn update_action(&self, todo: &TodoDTO) {
+        let result = self.dao.update_row(todo);
+        match result {
+            Ok(_) => println!("Updated todo: {}", todo),
+            Err(e) => println!("Update of todo failed: {}", e),
+        }
+    }
+
+    fn create_using_title_action(&self, title: &str) {
+        let id = self.dao.max_id() + 1;
+        let todo = TodoDTO::new(id, title);
+
+        let result = self.dao.insert_row(&todo);
+        match result {
+            Ok(_) => println!("Created new todo with name: {}", title),
+            Err(e) => println!("Created new todo with name failed: {}", e),
+        }
+    }
+
+    fn create_action(&self, todo: &TodoDTO) {
+        let result = self.dao.insert_row(todo);
+        match result {
+            Ok(_) => println!("Created todo: {}", todo),
+            Err(e) => println!("Creating new todo failed: {}", e),
+        }
+    }
+
+    fn remove_action(&self, todo: &TodoDTO) {
+        let result = self.dao.remove_row(todo.id());
+        match result {
+            Ok(_) => println!("Removed todo: {}", todo),
+            Err(e) => println!("Remove of todo failed: {}", e),
         }
     }
 
