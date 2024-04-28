@@ -52,3 +52,12 @@ fn complex_filter() {
     assert_eq!(filtered[0].id(), 0);
     assert_eq!(filtered[0].title, "Learn Y");
 }
+
+#[test]
+fn filter_none() {
+    let todos: Vec<TodoDTO> = get_test_todos().into();
+    let count = todos.len();
+    let filtered = FilterTodosBy::new().filter(&todos);
+
+    assert_eq!(filtered.len(), count);
+}

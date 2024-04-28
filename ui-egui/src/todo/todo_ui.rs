@@ -152,7 +152,7 @@ impl TodoView {
                     ui.label("1.1.2024");
 
                     ui.with_layout(Layout::top_down_justified(egui::Align::LEFT), |ui| {
-                        let title = Button::new(&item.title).wrap(true).frame(false);
+                        let title = SelectableLabel::new(false,&item.title);
                         let title_response = ui.add(title);
 
                         if title_response.clicked() {

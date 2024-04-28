@@ -1,8 +1,8 @@
 #![allow(dead_code)]
 
 use ::serde::*;
-use std::fmt;
 use rayon::prelude::*;
+use std::fmt;
 
 use crate::todo_dto::*;
 
