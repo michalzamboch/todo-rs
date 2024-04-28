@@ -1,6 +1,4 @@
-#![allow(dead_code, unused_imports)]
-
-use std::rc::Rc;
+#![allow(dead_code)]
 
 use super::todo_dao::*;
 use super::todo_dto::*;
