@@ -1,4 +1,4 @@
-use std::{error::Error, fmt::Debug, sync::Arc};
+use std::{error::Error, fmt::Debug, sync::*};
 
 pub trait IDao<T>: Debug + Send {
     fn select_by(&self, id: u32) -> Option<T>;
@@ -14,3 +14,18 @@ pub trait IDao<T>: Debug + Send {
 }
 
 pub type DaoRef<T> = Arc<Box<dyn IDao<T>>>;
+
+pub trait IDaoThreadSafe<T>: Debug + Send + Sync {
+    fn select_by(&self, id: u32) -> Option<T>;
+    fn get_all(&self) -> Vec<T>;
+
+    fn insert_row(&mut self, item: &T) -> Result<(), Box<dyn Error>>;
+    fn update_row(&mut self, item: &T) -> Result<(), Box<dyn Error>>;
+    fn remove_row(&mut self, id: u32) -> Result<(), Box<dyn Error>>;
+
+    fn count(&self) -> u32;
+    fn max_id(&self) -> u32;
+    fn exists(&self, id: u32) -> bool;
+}
+
+pub type DaoThreadSafeRef<T> = Arc<RwLock<dyn IDaoThreadSafe<T>>>;
