@@ -2,12 +2,29 @@
 
 use std::sync::*;
 
-use crate::{note_dto::*, types::traits::dao::*};
+use crate::{
+    note_dto::*,
+    note_persistency_json::*,
+    paths::*,
+    types::traits::{dao::*, persistency::*},
+};
 
 pub struct NoteDAOFactory {}
 
 impl NoteDAOFactory {
-    pub fn create() -> DaoThreadSafeRef<NoteDTO> {
+    pub fn create_loaded() -> DaoThreadSafeRef<NoteDTO> {
+        let dao = Self::create();
+        let thread_dao = dao.clone();
+
+        tokio::spawn(async move {
+            let note = NoteDTO::new(1, "Notes");
+            thread_dao.write().unwrap().todos = vec![note];
+        });
+
+        dao.clone()
+    }
+
+    fn create() -> Arc<RwLock<NoteDAO>> {
         let base = Self::create_base();
         let with_lock = RwLock::new(base);
 
@@ -15,13 +32,17 @@ impl NoteDAOFactory {
     }
 
     fn create_base() -> NoteDAO {
-        NoteDAO { todos: vec![] }
+        NoteDAO {
+            todos: vec![],
+            persistency: create_note_json_persistency(JSON_TODO_FILEPATH),
+        }
     }
 }
 
 #[derive(Debug)]
 struct NoteDAO {
     todos: Vec<NoteDTO>,
+    persistency: Box<dyn IPeristencyAsync<NoteDTO>>,
 }
 
 impl IDaoThreadSafe<NoteDTO> for NoteDAO {
