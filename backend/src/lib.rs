@@ -13,3 +13,5 @@ pub mod types;
 pub mod note_dao;
 pub mod note_dto;
 mod note_persistency_json;
+
+mod note_holder;

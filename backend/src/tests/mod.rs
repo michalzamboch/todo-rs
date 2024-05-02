@@ -3,3 +3,5 @@ mod todo_dao;
 mod todo_dto;
 mod todo_filter;
 mod todo_helpers;
+
+mod note_dao;

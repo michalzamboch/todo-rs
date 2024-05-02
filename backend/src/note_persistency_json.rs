@@ -23,7 +23,7 @@ pub fn create_note_json_persistency(path: &str) -> Box<dyn IPeristencyAsync<Note
 
 #[async_trait]
 impl IPeristencyAsync<NoteDTO> for NotePersistencyJson {
-    async fn load(&self) -> Result<Vec<NoteDTO>, Box<dyn Error>> {
+    async fn load(&self) -> Result<Vec<NoteDTO>, BoxedSendError> {
         let file = File::open(self.filepath.as_str())?;
         let reader = BufReader::new(file);
 
@@ -31,7 +31,7 @@ impl IPeristencyAsync<NoteDTO> for NotePersistencyJson {
         Ok(result)
     }
 
-    async fn save(&self, data: &[NoteDTO]) -> Result<(), Box<dyn Error>> {
+    async fn save(&self, data: &[NoteDTO]) -> Result<(), BoxedSendError> {
         let file = File::create(self.filepath.as_str())?;
         let mut writer = BufWriter::new(file);
         serde_json::to_writer(&mut writer, &data)?;
