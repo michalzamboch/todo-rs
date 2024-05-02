@@ -4,7 +4,6 @@ use crate::types::traits::persistency::*;
 
 use crate::note_dto::*;
 
-use std::error::Error;
 use std::fs::File;
 use std::io::{BufReader, BufWriter, Write};
 

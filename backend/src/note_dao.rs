@@ -1,6 +1,6 @@
 #![allow(dead_code, unused_variables)]
 
-use std::{error::Error, sync::*};
+use std::sync::*;
 
 use crate::{
     note_dto::*,

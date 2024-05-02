@@ -12,7 +12,6 @@ pub trait IPeristency<T>: Debug + Send + Sync {
         T: Sized + Serialize;
 }
 
-
 pub struct BoxedSendError(Box<dyn Error + Send>);
 impl Deref for BoxedSendError {
     type Target = Box<dyn Error + Send>;
