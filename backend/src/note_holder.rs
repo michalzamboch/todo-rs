@@ -1,35 +1,33 @@
-#![allow(dead_code, unused_variables)]
+#![allow(dead_code, unused_variables, unused_imports)]
 
-use std::{error::Error, ops::Deref, sync::*};
+use std::{error::Error, ops::Deref, sync::*, thread, time::Duration};
 
 use crate::{note_dto::*, note_persistency_json::*, types::traits::persistency::*};
-
-pub async fn create_new_test(
-    path: &str,
-) -> Arc<Mutex<Option<Result<Vec<NoteDTO>, BoxedSendError>>>> {
-    let calculation_result = Arc::new(Mutex::new(None));
-    let tmp = calculation_result.clone();
-
-    let p = create_note_json_persistency(path);
-    let x = p.load().await;
-
-    let mut locked = tmp.lock().unwrap();
-    *locked = Some(x);
-    calculation_result
-}
 
 const TEST_ID: u32 = 0;
 const TEST_TITLE: &str = "Test title";
 const TEST_PATH: &str = "src/tests/files/todo_test_data.json";
 
+pub fn create_new_test(path: &str) -> Arc<RwLock<Vec<NoteDTO>>> {
+    let v: Vec<NoteDTO> = vec![];
+    let calculation_result = Arc::new(RwLock::new(v));
+    let tmp = calculation_result.clone();
+
+    let note = NoteDTO::new(TEST_ID, TEST_TITLE);
+    tokio::spawn(async move {
+        let mut locked = tmp.write().unwrap();
+        *locked = vec![note];
+    });
+
+    calculation_result
+}
+
 #[tokio::test]
 async fn read_test_data() {
-    let res = create_new_test(TEST_PATH).await;
-    let data = res.lock();
-    match data {
-        Ok(x) => {
-        },
-        Err(_) => todo!(),
-    }
+    let res = create_new_test(TEST_PATH);
 
+    tokio::time::sleep(Duration::from_millis(100)).await;
+    let data = res.read();
+
+    assert!(data.is_ok_and(|i| i.len() == 1));
 }
