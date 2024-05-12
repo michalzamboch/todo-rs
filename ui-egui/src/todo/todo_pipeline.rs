@@ -1,6 +1,7 @@
 #![allow(dead_code)]
 
 use std::collections::*;
+use std::sync::RwLock;
 
 use backend::todo_dto::*;
 use backend::types::traits::dao::*;
@@ -20,6 +21,17 @@ pub enum PipelineCommand {
 pub struct TodoPipeline {
     dao: DaoRef<TodoDTO>,
     commands: VecDeque<PipelineCommand>,
+}
+
+pub fn create_prepared_todo_pipeline_rw(dao: DaoRef<TodoDTO>) -> RwLock<TodoPipeline> {
+    let tmp = TodoPipeline {
+        dao: dao.clone(),
+        commands: VecDeque::new(),
+    };
+
+    let pipeline: RwLock<TodoPipeline> = RwLock::new(tmp);
+    pipeline.write().unwrap().push(PipelineCommand::Load);
+    pipeline
 }
 
 pub fn create_prepared_todo_pipeline(dao: DaoRef<TodoDTO>) -> Box<TodoPipeline> {
