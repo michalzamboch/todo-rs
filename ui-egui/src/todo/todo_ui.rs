@@ -8,18 +8,18 @@ use super::{todo_cache::*, todo_handler::*, todo_pipeline::PipelineCommand::*};
 #[derive(Debug)]
 pub struct TodoView {
     dao: DaoRef<TodoDTO>,
-    todo_handler: Box<TodoViewHandler>,
-    todo_cache: Box<TodoCache>,
+    handler: Box<TodoViewHandler>,
+    cache: Box<TodoCache>,
 }
 
 pub fn create_filled_todo_view(dao: DaoRef<TodoDTO>) -> Box<TodoView> {
-    let todo_handler = create_todo_handler(dao.clone());
-    let todo_cache = create_todo_cache();
+    let handler = create_todo_handler(dao.clone());
+    let cache = create_todo_cache();
 
     let app_view = TodoView {
         dao,
-        todo_handler,
-        todo_cache,
+        handler,
+        cache,
     };
 
     Box::new(app_view)
@@ -46,10 +46,11 @@ impl TodoView {
     }
 
     fn create_right_panel(&mut self, ctx: &Context) {
-        let show = self.todo_cache.current_selected;
+        let show = self.cache.current_selected;
         if show {
             egui::SidePanel::right("todo_detail")
                 .max_width(400.)
+                .min_width(175.)
                 .default_width(225.)
                 .resizable(true)
                 .show(ctx, |ui| {
@@ -68,13 +69,13 @@ impl TodoView {
     }
 
     fn create_time_created(&mut self, ui: &mut Ui) {
-        let curent = &self.todo_cache.current;
+        let curent = &self.cache.current;
         ui.label("Created:");
         ui.label(&curent.creation_time_fmt());
     }
 
     fn create_title_edit(&mut self, ui: &mut Ui) {
-        let curent = &mut self.todo_cache.current;
+        let curent = &mut self.cache.current;
 
         ui.label("Title");
         ui.with_layout(Layout::top_down_justified(Align::Max), |ui| {
@@ -83,13 +84,13 @@ impl TodoView {
 
             if response.lost_focus() && ui.input(|i| i.key_pressed(Key::Enter)) {
                 let copy = curent.clone();
-                self.todo_handler.push_command(Update(copy));
+                self.handler.push_command(Update(copy));
             }
         });
     }
 
     fn create_description_edit(&mut self, ui: &mut Ui) {
-        let curent = &mut self.todo_cache.current;
+        let curent = &mut self.cache.current;
 
         ui.label("Description");
         let desc_edit =
@@ -98,7 +99,7 @@ impl TodoView {
 
         if response.lost_focus() {
             let copy = curent.clone();
-            self.todo_handler.push_command(Update(copy));
+            self.handler.push_command(Update(copy));
         }
     }
 
@@ -113,7 +114,7 @@ impl TodoView {
             egui::ScrollArea::vertical().show(ui, |ui| {
                 self.list_undone_todos(ui);
 
-                if !self.todo_cache.done.is_empty() {
+                if !self.cache.done.is_empty() {
                     ui.collapsing("Done", |ui| {
                         self.list_done_todos(ui);
                     });
@@ -125,7 +126,7 @@ impl TodoView {
     }
 
     fn list_undone_todos(&mut self, ui: &mut Ui) {
-        for item in self.todo_cache.undone.iter_mut() {
+        for item in self.cache.undone.iter_mut() {
             ui.add_space(5.);
 
             ui.horizontal(|ui| {
@@ -134,11 +135,11 @@ impl TodoView {
                     let check_btn_respose = ui.add(check_btn);
 
                     if check_btn_respose.clicked() {
-                        if item.equal_by_id(&self.todo_cache.current) {
-                            self.todo_cache.current_selected = false;
+                        if item.equal_by_id(&self.cache.current) {
+                            self.cache.current_selected = false;
                         }
 
-                        self.todo_handler.push_command(Update(item.clone()));
+                        self.handler.push_command(Update(item.clone()));
                         println!("Clicked check box: {}", item.title);
                     }
                 });
@@ -152,8 +153,8 @@ impl TodoView {
                         let title_response = ui.add(title);
 
                         if title_response.clicked() {
-                            self.todo_cache.current = item.clone();
-                            self.todo_cache.current_selected = true;
+                            self.cache.current = item.clone();
+                            self.cache.current_selected = true;
                             println!("Clicked label: {}", item);
                         }
                     });
@@ -165,7 +166,7 @@ impl TodoView {
     }
 
     fn list_done_todos(&mut self, ui: &mut Ui) {
-        for item in self.todo_cache.done.iter_mut() {
+        for item in self.cache.done.iter_mut() {
             ui.add_space(5.);
 
             ui.horizontal(|ui| {
@@ -173,7 +174,7 @@ impl TodoView {
                     let check_btn = Checkbox::without_text(&mut item.completed);
                     let check_btn_respose = ui.add(check_btn);
                     if check_btn_respose.clicked() {
-                        self.todo_handler.push_command(Update(item.clone()));
+                        self.handler.push_command(Update(item.clone()));
                         println!("Clicked check box: {}", item.title);
                     }
 
@@ -185,7 +186,7 @@ impl TodoView {
                         let remove_btn = Button::new("❌").frame(false);
                         let response = ui.add(remove_btn);
                         if response.clicked() {
-                            self.todo_handler.push_command(Delete(item.clone()));
+                            self.handler.push_command(Delete(item.clone()));
                         }
                     });
                 });
@@ -208,23 +209,22 @@ impl TodoView {
     fn add_todo_creation_bar(&mut self, ui: &mut Ui) {
         ui.horizontal(|ui| {
             let width = ui.available_width();
-            let input_line = TextEdit::singleline(&mut self.todo_cache.new_title)
+            let input_line = TextEdit::singleline(&mut self.cache.new_title)
                 .desired_width(width)
                 .hint_text("New todo");
             let response = ui.add(input_line);
 
             if response.lost_focus() && ui.input(|i| i.key_pressed(Key::Enter)) {
-                let title = self.todo_cache.new_title.clone();
-                self.todo_handler
-                    .push_command(CreateUsingTitle(title.clone()));
+                let title = self.cache.new_title.clone();
+                self.handler.push_command(CreateUsingTitle(title.clone()));
 
-                self.todo_cache.new_title.clear();
+                self.cache.new_title.clear();
             }
         });
     }
 
     fn process_pipeline(&mut self) {
-        let update = self.todo_handler.execute_pipeline();
+        let update = self.handler.execute_pipeline();
         if update {
             self.data_update();
         }
@@ -233,8 +233,8 @@ impl TodoView {
     fn data_update(&mut self) {
         let all_todos = self.dao.get_all();
         let divided = split_done_undone(&all_todos);
-        self.todo_cache.done = divided.0;
-        self.todo_cache.undone = divided.1;
+        self.cache.done = divided.0;
+        self.cache.undone = divided.1;
     }
 }
 
