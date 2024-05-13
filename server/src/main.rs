@@ -30,7 +30,9 @@ fn main() {
             loop {
                 let msg = websocket.read().unwrap();
                 if msg.is_binary() || msg.is_text() {
-                    websocket.send(msg).unwrap();
+                    //websocket.send(msg).unwrap();
+                    let text = msg.into_text().unwrap_or_default();
+                    println!("{}", text);
                 }
             }
         });
