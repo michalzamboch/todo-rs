@@ -42,7 +42,6 @@ impl TodoView {
         egui::TopBottomPanel::top("todo_header").show(ctx, |ui| {
             ui.add_space(5.);
             ui.horizontal(|ui| {
-
                 let clear_icon = egui::include_image!("../../assets/images/bin.png");
                 let clear_btn = Button::image_and_text(clear_icon, "CLear");
                 let response = ui.add(clear_btn);
@@ -61,15 +60,39 @@ impl TodoView {
                 if response.clicked() {
                     self.handler.push_command(Load);
                     self.cache.current_selected = false;
+                    self.cache.activate_search = false;
+                    self.cache.search_term.clear();
                 }
 
-                ui.with_layout(Layout::top_down_justified(egui::Align::RIGHT), |ui| {
-                    ui.heading("Todo list");
+                ui.with_layout(Layout::right_to_left(egui::Align::RIGHT), |ui| {
+                    self.create_search_bar(ui);
                 });
             });
 
             ui.add_space(5.);
         });
+    }
+
+    fn create_search_bar(&mut self, ui: &mut Ui) {
+        if self.cache.activate_search {
+            let cancel_icon = egui::include_image!("../../assets/images/close.png");
+            let cancel_btn = Button::image_and_text(cancel_icon, "Cancel");
+            let response = ui.add(cancel_btn);
+
+            if response.clicked() {
+                self.cache.activate_search = false;
+                self.cache.search_term.clear();
+                self.handler.push_command(Load);
+            }
+        }
+
+        let search_line = TextEdit::singleline(&mut self.cache.search_term).hint_text("Search");
+        let response = ui.add(search_line);
+
+        if response.lost_focus() && ui.input(|i| i.key_pressed(Key::Enter)) {
+            self.cache.activate_search = true;
+            self.handler.push_command(Load);
+        }
     }
 
     fn create_right_panel(&mut self, ctx: &Context) {
@@ -261,7 +284,14 @@ impl TodoView {
         let all_todos = self.dao.get_all();
         let divided = split_done_undone(&all_todos);
         self.cache.done = divided.0;
-        self.cache.undone = divided.1;
+
+        if self.cache.activate_search {
+            let search_term = &self.cache.search_term;
+            let filtered = FilterTodosBy::new().title(search_term).filter(&divided.1);
+            self.cache.undone = filtered;
+        } else {
+            self.cache.undone = divided.1;
+        }
     }
 }
 
