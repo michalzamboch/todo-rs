@@ -3,7 +3,11 @@
 use backend::{todo_dto::*, todo_filter::*, types::traits::dao::*};
 use eframe::egui::{self, *};
 
-use super::{todo_cache::*, todo_handler::*, todo_pipeline::PipelineCommand::*};
+use super::{
+    todo_cache::*,
+    todo_handler::*,
+    todo_pipeline::PipelineCommand::{self, *},
+};
 
 #[derive(Debug)]
 pub struct TodoView {
@@ -35,10 +39,33 @@ impl TodoView {
     }
 
     fn create_header(&mut self, ctx: &egui::Context) {
-        egui::TopBottomPanel::top("Header").show(ctx, |ui| {
+        egui::TopBottomPanel::top("todo_header").show(ctx, |ui| {
             ui.add_space(5.);
-            ui.vertical_centered(|ui| {
-                ui.heading("Todo List");
+            ui.horizontal(|ui| {
+
+                let clear_icon = egui::include_image!("../../assets/images/bin.png");
+                let clear_btn = Button::image_and_text(clear_icon, "CLear");
+                let response = ui.add(clear_btn);
+
+                if response.clicked() {
+                    let remove: Box<[PipelineCommand]> =
+                        self.cache.done.clone().into_iter().map(Delete).collect();
+
+                    self.handler.push_commands(&remove);
+                }
+
+                let load_icon = egui::include_image!("../../assets/images/sync.png");
+                let load_btn = Button::image_and_text(load_icon, "Load");
+                let response = ui.add(load_btn);
+
+                if response.clicked() {
+                    self.handler.push_command(Load);
+                    self.cache.current_selected = false;
+                }
+
+                ui.with_layout(Layout::top_down_justified(egui::Align::RIGHT), |ui| {
+                    ui.heading("Todo list");
+                });
             });
 
             ui.add_space(5.);

@@ -126,4 +126,10 @@ impl TodoPipeline {
     pub fn push(&mut self, cmd: PipelineCommand) {
         self.commands.push_back(cmd);
     }
+
+    pub fn push_array(&mut self, cmds: &[PipelineCommand]) {
+        for cmd in cmds.iter().cloned() {
+            self.push(cmd);
+        }
+    }
 }

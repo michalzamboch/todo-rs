@@ -24,6 +24,10 @@ impl TodoViewHandler {
         self.pipeline.push(cmd);
     }
 
+    pub fn push_commands(&mut self, cmds: &[PipelineCommand]) {
+        self.pipeline.push_array(cmds);
+    }
+
     pub fn execute_pipeline(&mut self) -> bool {
         self.pipeline.execute()
     }
