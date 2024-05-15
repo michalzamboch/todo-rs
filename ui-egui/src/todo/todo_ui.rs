@@ -43,7 +43,7 @@ impl TodoView {
             ui.add_space(5.);
             ui.horizontal(|ui| {
                 let clear_icon = egui::include_image!("../../assets/images/bin.png");
-                let clear_btn = Button::image_and_text(clear_icon, "CLear");
+                let clear_btn = Button::image_and_text(clear_icon, "Clear");
                 let response = ui.add(clear_btn);
 
                 if response.clicked() {
