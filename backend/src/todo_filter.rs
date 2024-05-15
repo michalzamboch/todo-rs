@@ -42,7 +42,7 @@ impl FilterTodosBy {
         if let Some(x) = self.title.clone() {
             result = result
                 .par_iter()
-                .filter(|&i| i.title.contains(x.as_str()))
+                .filter(|&i| i.title.contains(&x))
                 .cloned()
                 .collect();
         }

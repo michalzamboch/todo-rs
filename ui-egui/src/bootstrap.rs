@@ -44,6 +44,8 @@ struct AppView {
 
 impl eframe::App for AppView {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+        set_font(ctx);
+
         if ctx.input(|i| i.key_pressed(Key::Escape)) {
             ctx.send_viewport_cmd(ViewportCommand::Close);
         }
@@ -67,4 +69,30 @@ impl eframe::App for AppView {
     fn persist_egui_memory(&self) -> bool {
         true
     }
+}
+
+fn set_font(ctx: &Context) {
+    let mut fonts = FontDefinitions::default();
+    fonts.font_data.insert(
+        "droid_sans_propo".to_owned(),
+        FontData::from_static(include_bytes!("../assets/fonts/DroidSansMono/DroidSansMNerdFontPropo-Regular.otf")),
+    );
+    fonts.font_data.insert(
+        "droid_sans_mono".to_owned(),
+        FontData::from_static(include_bytes!("../assets/fonts/DroidSansMono/DroidSansMNerdFontMono-Regular.otf")),
+    );
+
+    fonts
+        .families
+        .get_mut(&FontFamily::Proportional)
+        .unwrap()
+        .insert(0, "droid_sans_propo".to_owned());
+
+    fonts
+        .families
+        .get_mut(&FontFamily::Monospace)
+        .unwrap()
+        .push("droid_sans_mono".to_owned());
+
+    ctx.set_fonts(fonts);
 }
