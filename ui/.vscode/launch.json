@@ -7,15 +7,15 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug executable 'ui-egui'",
+            "name": "Debug executable 'ui'",
             "cargo": {
                 "args": [
                     "build",
-                    "--bin=ui-egui",
-                    "--package=ui-egui"
+                    "--bin=ui",
+                    "--package=ui"
                 ],
                 "filter": {
-                    "name": "ui-egui",
+                    "name": "ui",
                     "kind": "bin"
                 }
             },
@@ -25,16 +25,16 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug unit tests in executable 'ui-egui'",
+            "name": "Debug unit tests in executable 'ui'",
             "cargo": {
                 "args": [
                     "test",
                     "--no-run",
-                    "--bin=ui-egui",
-                    "--package=ui-egui"
+                    "--bin=ui",
+                    "--package=ui"
                 ],
                 "filter": {
-                    "name": "ui-egui",
+                    "name": "ui",
                     "kind": "bin"
                 }
             },
