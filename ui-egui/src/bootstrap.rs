@@ -5,6 +5,7 @@ use crate::{constants::*, todo::todo_ui::*};
 
 use backend::model_handler::*;
 use eframe::egui::{self, *};
+use egui_notify::*;
 
 pub fn run() -> Result<(), eframe::Error> {
     env_logger::init(); // Log to stderr (if you run with `RUST_LOG=debug`).
@@ -22,34 +23,36 @@ pub fn run() -> Result<(), eframe::Error> {
         Box::new(|cc| {
             egui_extras::install_image_loaders(&cc.egui_ctx);
 
-            create_filled_view()
+            create_filled_view(cc)
         }),
     )
 }
 
-fn create_filled_view() -> Box<AppView> {
+fn create_filled_view(cc: &eframe::CreationContext<'_>) -> Box<AppView> {
     let model = create_new_handler();
     let todo_view = create_filled_todo_view(model.todos().clone());
+    let toasts = Box::new(Toasts::default());
 
-    let app_view = AppView { model, todo_view };
+    let app_view = AppView { model, todo_view, toasts };
 
+    set_font(&cc.egui_ctx);
     Box::new(app_view)
 }
 
-#[derive(Debug)]
 struct AppView {
     model: Box<ModelHandler>,
     todo_view: Box<TodoView>,
+    toasts: Box<Toasts>,
 }
 
 impl eframe::App for AppView {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-        set_font(ctx);
-
         if ctx.input(|i| i.key_pressed(Key::Escape)) {
             ctx.send_viewport_cmd(ViewportCommand::Close);
         }
+
         self.todo_view.update(ctx);
+        self.toasts.show(ctx);
     }
 
     fn save(&mut self, _storage: &mut dyn eframe::Storage) {}
