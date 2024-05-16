@@ -14,8 +14,7 @@ fn load_data() {
     let persistency = create_todo_json_persistency(TEST_PATH);
     let result = persistency.load();
 
-    assert!(result.is_ok());
-    assert_eq!(result.unwrap().len(), 3);
+    assert!(result.is_ok_and(|x| {x.len() == 3}));
 }
 
 #[test]

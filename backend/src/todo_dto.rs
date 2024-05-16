@@ -13,6 +13,7 @@ pub struct TodoDTO {
     pub completed: bool,
     pub stared: bool,
     pub creation_time: DateTime<Local>,
+    pub updated_time: DateTime<Local>,
     pub to_be_done_time: Option<DateTime<Local>>,
 }
 
@@ -22,6 +23,7 @@ impl TodoDTO {
             id,
             title: title.to_owned(),
             creation_time: Local::now(),
+            updated_time: Local::now(),
             ..Default::default()
         }
     }
@@ -42,6 +44,10 @@ impl TodoDTO {
         self.creation_time.format("%H:%M %Y-%m-%d").to_string()
     }
 
+    pub fn updated_time_fmt(&self) -> String {
+        self.updated_time.format("%H:%M %Y-%m-%d").to_string()
+    }
+
     pub fn update_from_equal(&mut self, other: TodoDTO) -> Result<(), Box<dyn Error>> {
         if self.id() != other.id() {
             return Err("IDs are not equal.".into());
@@ -53,6 +59,7 @@ impl TodoDTO {
         self.description = other.description;
         self.stared = other.stared;
         self.creation_time = other.creation_time;
+        self.updated_time = Local::now();
         self.to_be_done_time = other.to_be_done_time;
 
         Ok(())
@@ -62,7 +69,7 @@ impl TodoDTO {
 impl fmt::Display for TodoDTO {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let result = format!(
-            "ID: {} Folder ID: {} title: {}\n description: {} completed: {} stared: {}\n created: {} to be done: {}",
+            "ID: {} Folder ID: {} title: {}\n description: {} completed: {} stared: {}\n created: {} updated: {} to be done: {}",
             self.id,
             self.folder_id.unwrap_or_default(),
             self.title,
@@ -70,6 +77,7 @@ impl fmt::Display for TodoDTO {
             self.completed,
             self.stared,
             self.creation_time,
+            self.updated_time,
             self.to_be_done_time.unwrap_or_default(),
         );
         write!(f, "{}", result)

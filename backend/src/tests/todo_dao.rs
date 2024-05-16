@@ -39,7 +39,7 @@ fn insert_row() {
     let result = todo_dao.select_by(TEST_ID);
 
     assert!(result.is_some());
-    assert_eq!(result.unwrap().id(), TEST_ID);
+    assert!(result.is_some_and(|x| x.id() == TEST_ID));
 }
 
 #[test]
