@@ -38,8 +38,7 @@ async fn load_data_from_persistency() {
 }
 
 fn persistency_loader(path: &str) -> Arc<RwLock<Vec<NoteDTO>>> {
-    let empty: Vec<NoteDTO> = vec![];
-    let result = Arc::new(RwLock::new(empty));
+    let result = Arc::new(RwLock::new(Vec::<NoteDTO>::new()));
     let persistency = Arc::new(create_note_json_persistency(path));
 
     let thread_result = result.clone();
