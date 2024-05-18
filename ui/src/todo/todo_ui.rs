@@ -195,9 +195,6 @@ impl TodoView {
                 });
 
                 ui.with_layout(Layout::right_to_left(Align::BOTTOM), |ui| {
-                    ui.add_space(10.);
-                    ui.label("1.1.2024");
-
                     ui.with_layout(Layout::top_down_justified(egui::Align::LEFT), |ui| {
                         let title = SelectableLabel::new(false, &item.title);
                         let title_response = ui.add(title);

@@ -33,7 +33,7 @@ pub fn run() -> Result<(), eframe::Error> {
 fn create_filled_view(cc: &eframe::CreationContext<'_>) -> Box<AppView> {
     let model = create_new_handler();
     let todo_view = create_filled_todo_view(model.todos().clone());
-    let toasts = Box::new(Toasts::default());
+    let toasts = Box::<Toasts>::default();
 
     let app_view = AppView {
         model,
@@ -42,6 +42,7 @@ fn create_filled_view(cc: &eframe::CreationContext<'_>) -> Box<AppView> {
     };
 
     set_font(&cc.egui_ctx);
+    set_text_sizes(&cc.egui_ctx);
     set_empty_toasts(&cc.egui_ctx);
     Box::new(app_view)
 }
@@ -145,6 +146,22 @@ fn set_font(ctx: &Context) {
         .push("droid_sans_mono".to_owned());
 
     ctx.set_fonts(fonts);
+}
+
+fn set_text_sizes(ctx: &egui::Context) {
+    use FontFamily::Proportional;
+    use TextStyle::*;
+
+    let mut style = (*ctx.style()).clone();
+    style.text_styles = [
+        (Heading, FontId::new(25.0, Proportional)),
+        (Body, FontId::new(15.0, Proportional)),
+        (Monospace, FontId::new(15.0, Proportional)),
+        (Button, FontId::new(15.0, Proportional)),
+        (Small, FontId::new(9.0, Proportional)),
+    ]
+    .into();
+    ctx.set_style(style);
 }
 
 fn set_empty_toasts(ctx: &Context) {
