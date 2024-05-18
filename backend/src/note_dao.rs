@@ -49,7 +49,7 @@ impl NoteDAOFactory {
 
             let binding = thread_dao.read().unwrap();
             let res = binding.persistency.load();
-            thread_dao.write().unwrap().todos = Arc::new(Mutex::new(vec![note]));
+            thread_dao.write().unwrap().notes = Arc::new(Mutex::new(vec![note]));
         });
 
         dao.clone()
@@ -64,7 +64,7 @@ impl NoteDAOFactory {
 
     fn create_base() -> NoteDAO {
         NoteDAO {
-            todos: Arc::new(Mutex::new(vec![])),
+            notes: Arc::new(Mutex::new(vec![])),
             persistency: Arc::new(create_note_json_persistency(JSON_TODO_FILEPATH)),
         }
     }
@@ -72,12 +72,30 @@ impl NoteDAOFactory {
 
 #[derive(Debug)]
 pub struct NoteDAO {
-    todos: Arc<Mutex<Vec<NoteDTO>>>,
+    notes: Arc<Mutex<Vec<NoteDTO>>>,
     persistency: Arc<Box<dyn IPeristencyAsync<NoteDTO>>>,
 }
 
 impl NoteDAO {
     async fn reload(&self) {}
+}
+
+impl ILoadable<NoteDTO> for NoteDAO {
+    fn load(&self) -> Result<(), BoxedSendError> {
+        let thread_persistency = self.persistency.clone();
+        let thread_data = self.notes.clone();
+
+        let handler = tokio::spawn(async move {
+            let data = thread_persistency.load().await;
+
+            if let Ok(vec) = data {
+                let mut target = thread_data.lock().unwrap();
+                *target = vec;
+            }
+        });
+
+        Ok(())
+    }
 }
 
 impl IDaoThreadSafe<NoteDTO> for NoteDAO {
@@ -86,15 +104,20 @@ impl IDaoThreadSafe<NoteDTO> for NoteDAO {
     }
 
     fn get_all(&self) -> Vec<NoteDTO> {
-        let res = self.todos.lock().unwrap();
+        let res = self.notes.lock().unwrap();
         res.clone()
     }
 
     fn insert_row(&mut self, item: &NoteDTO) -> Result<(), Box<dyn std::error::Error>> {
-        let clone = self.persistency.clone();
-        let data = vec![NoteDTO::new(0, "Sent note.")];
+        let mut writer = self.notes.lock().unwrap();
+        writer.push(item.clone());
+
+        let thread_persistency = self.persistency.clone();
+        let thread_data = self.notes.clone();
+
         tokio::spawn(async move {
-            let x = clone.save(&data).await;
+            let data = thread_data.lock().unwrap().clone();
+            let result = thread_persistency.save(&data).await;
         });
 
         Ok(())

@@ -1,5 +1,7 @@
 use std::{error::Error, fmt::Debug, sync::*};
 
+use super::persistency::ILoadable;
+
 pub trait IDao<T>: Debug + Send {
     fn select_by(&self, id: u32) -> Option<T>;
     fn get_all(&self) -> Vec<T>;
@@ -15,7 +17,7 @@ pub trait IDao<T>: Debug + Send {
 
 pub type DaoRef<T> = Arc<Box<dyn IDao<T>>>;
 
-pub trait IDaoThreadSafe<T>: Debug + Send + Sync {
+pub trait IDaoThreadSafe<T>: Debug + Send + Sync + ILoadable<T> {
     fn select_by(&self, id: u32) -> Option<T>;
     fn get_all(&self) -> Vec<T>;
 

@@ -65,7 +65,9 @@ fn filter_none() {
 #[test]
 fn filter_title_none() {
     let todos: Vec<TodoDTO> = get_test_todos().into();
-    let filtered = FilterTodosBy::new().title("XXXXXXXXXXXXXXXXXXXXXXXXXXXXX").filter(&todos);
+    let filtered = FilterTodosBy::new()
+        .title("XXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+        .filter(&todos);
 
     assert_eq!(filtered.len(), 0);
 }
