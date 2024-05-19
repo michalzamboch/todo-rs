@@ -2,7 +2,12 @@
 
 use std::{error::Error, ops::Deref, sync::*, thread, time::Duration};
 
-use crate::{note_dto::*, note_persistency_json::*, types::traits::persistency::*};
+use crate::{
+    note_dao::NoteDAOFactory,
+    note_dto::*,
+    note_persistency_json::*,
+    types::traits::{dao::IDaoThreadSafe, persistency::*},
+};
 
 const TEST_ID: u32 = 0;
 const TEST_TITLE: &str = "Test title";
@@ -70,4 +75,15 @@ fn persistency_saver(path: &str) {
     tokio::spawn(async move {
         let _ = thread_persistency.save(&data).await;
     });
+}
+
+#[tokio::test]
+async fn load_data_dao() {
+    let dao = NoteDAOFactory::create_base();
+
+    let data = dao.get_all();
+    assert!(data.is_empty());
+
+    let _ = dao.load();
+    tokio::time::sleep(Duration::from_millis(1)).await;
 }

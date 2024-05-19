@@ -12,34 +12,6 @@ use crate::{
 pub struct NoteDAOFactory {}
 
 impl NoteDAOFactory {
-    /*
-    pub fn create_test(path: &str) -> NoteDAO {
-        let persistency = Arc::new(create_note_json_persistency(path));
-        let empty: Vec<NoteDTO> = vec![];
-        let calculation_result = Arc::new(Mutex::new(empty));
-
-        let loadable = persistency.clone();
-        let value_future = async move {
-            let val = loadable.load().await;
-            val.unwrap()
-        };
-
-        let result_for_thread = calculation_result.clone();
-        let handle = tokio::spawn(async move {
-            let result = value_future.await;
-            let mut mutex_lock = result_for_thread.lock().unwrap();
-            *mutex_lock = result;
-        });
-
-        let result = NoteDAO {
-            todos: calculation_result,
-            persistency: persistency.clone(),
-        };
-
-        result
-    }
-     */
-
     pub fn create_loaded() -> DaoThreadSafeRef<NoteDTO> {
         let dao = Self::create();
         let thread_dao = dao.clone();
@@ -55,17 +27,17 @@ impl NoteDAOFactory {
         dao.clone()
     }
 
-    fn create() -> Arc<RwLock<NoteDAO>> {
+    pub fn create() -> Arc<RwLock<NoteDAO>> {
         let base = Self::create_base();
         let with_lock = RwLock::new(base);
 
         Arc::new(with_lock)
     }
 
-    fn create_base() -> NoteDAO {
+    pub fn create_base() -> NoteDAO {
         NoteDAO {
             notes: Arc::new(Mutex::new(vec![])),
-            persistency: Arc::new(create_note_json_persistency(JSON_TODO_FILEPATH)),
+            persistency: Arc::new(create_note_json_persistency(NOTE_TODO_FILEPATH)),
         }
     }
 }
