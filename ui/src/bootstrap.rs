@@ -15,7 +15,7 @@ pub fn run() -> Result<(), eframe::Error> {
     let options = eframe::NativeOptions {
         viewport: egui::ViewportBuilder::default()
             .with_inner_size(DEFAULT_WINDOW_SIZE)
-            .with_min_inner_size(DEFAULT_WINDOW_SIZE),
+            .with_min_inner_size(MIN_WINDOW_SIZE),
         ..Default::default()
     };
 
@@ -154,10 +154,10 @@ fn set_text_sizes(ctx: &egui::Context) {
 
     let mut style = (*ctx.style()).clone();
     style.text_styles = [
-        (Heading, FontId::new(25.0, Proportional)),
-        (Body, FontId::new(15.0, Proportional)),
-        (Monospace, FontId::new(15.0, Proportional)),
-        (Button, FontId::new(15.0, Proportional)),
+        (Heading, FontId::new(20.0, Proportional)),
+        (Body, FontId::new(14.0, Proportional)),
+        (Monospace, FontId::new(14.0, Proportional)),
+        (Button, FontId::new(14.0, Proportional)),
         (Small, FontId::new(9.0, Proportional)),
     ]
     .into();

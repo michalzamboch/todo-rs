@@ -48,10 +48,6 @@ pub struct NoteDAO {
     persistency: Arc<Box<dyn IPeristencyAsync<NoteDTO>>>,
 }
 
-impl NoteDAO {
-    async fn reload(&self) {}
-}
-
 impl ILoadable<NoteDTO> for NoteDAO {
     fn load(&self) -> Result<(), BoxedSendError> {
         let thread_persistency = self.persistency.clone();
