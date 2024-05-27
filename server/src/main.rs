@@ -29,10 +29,27 @@ fn main() {
 
             loop {
                 let msg = websocket.read().unwrap();
-                if msg.is_binary() || msg.is_text() {
-                    //websocket.send(msg).unwrap();
-                    let text = msg.into_text().unwrap_or_default();
-                    println!("{}", text);
+                match msg {
+                    tungstenite::Message::Text(text) => {
+                        //websocket.send(msg).unwrap();
+
+                        println!("{}", text);
+                    }
+                    tungstenite::Message::Binary(binary) => {
+                        println!("{:?}", binary);
+                    }
+                    tungstenite::Message::Ping(message) => {
+                        println!("{:?}", message);
+                    }
+                    tungstenite::Message::Pong(message) => {
+                        println!("{:?}", message);
+                    }
+                    tungstenite::Message::Close(message) => {
+                        println!("{:?}", message);
+                    }
+                    tungstenite::Message::Frame(message) => {
+                        println!("{:?}", message);
+                    }
                 }
             }
         });
