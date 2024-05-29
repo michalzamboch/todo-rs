@@ -3,6 +3,7 @@ mod tests;
 mod todo_dao;
 mod todo_persistency_dummy;
 mod todo_persistency_json;
+mod todo_persistency_ws;
 
 pub mod model_handler;
 pub mod subtask;

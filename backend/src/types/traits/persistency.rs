@@ -3,7 +3,7 @@ use std::{error::Error, fmt::Debug, ops::Deref};
 
 use serde::{de::DeserializeOwned, *};
 
-pub trait IPeristency<T>: Debug + Send + Sync {
+pub trait IPeristency<T>: Debug + Send {
     fn load(&self) -> Result<Vec<T>, Box<dyn Error>>
     where
         T: DeserializeOwned;

@@ -37,7 +37,7 @@ impl NoteDAOFactory {
     pub fn create_base() -> NoteDAO {
         NoteDAO {
             notes: Arc::new(Mutex::new(vec![])),
-            persistency: Arc::new(create_note_json_persistency(NOTE_TODO_FILEPATH)),
+            persistency: Arc::new(create_note_json_persistency(JSON_NOTE_FILEPATH)),
         }
     }
 }

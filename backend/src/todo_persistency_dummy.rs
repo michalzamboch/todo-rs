@@ -42,3 +42,20 @@ impl IPeristency<TodoDTO> for TodoPersistencyDummy {
         Ok(())
     }
 }
+
+#[derive(Debug, Default, Clone)]
+struct EmptyPersistency;
+
+pub fn create_empty_todo_persistency() -> Box<dyn IPeristency<TodoDTO>> {
+    Box::new(EmptyPersistency)
+}
+
+impl IPeristency<TodoDTO> for EmptyPersistency {
+    fn load(&self) -> Result<Vec<TodoDTO>, Box<dyn Error>> {
+        Ok(vec![])
+    }
+
+    fn save(&self, data: &[TodoDTO]) -> Result<(), Box<dyn Error>> {
+        Ok(())
+    }
+}
