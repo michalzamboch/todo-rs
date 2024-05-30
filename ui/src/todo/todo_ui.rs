@@ -6,6 +6,7 @@ use eframe::egui::{self, *};
 use super::{
     todo_cache::*,
     todo_handler::*,
+    todo_images::*,
     todo_pipeline::PipelineCommand::{self, *},
 };
 
@@ -14,16 +15,19 @@ pub struct TodoView {
     dao: DaoRef<TodoDTO>,
     handler: Box<TodoViewHandler>,
     cache: Box<TodoCache>,
+    images: Box<TodoImages>,
 }
 
 pub fn create_filled_todo_view(dao: DaoRef<TodoDTO>) -> Box<TodoView> {
     let handler = create_todo_handler(dao.clone());
     let cache = create_todo_cache();
+    let images = create_todo_images();
 
     let app_view = TodoView {
         dao,
         handler,
         cache,
+        images,
     };
 
     Box::new(app_view)
@@ -42,7 +46,7 @@ impl TodoView {
         egui::TopBottomPanel::top("todo_header").show(ctx, |ui| {
             ui.add_space(5.);
             ui.horizontal(|ui| {
-                let clear_icon = egui::include_image!("../../assets/images/bin.png");
+                let clear_icon = self.images.trash_can.clone();
                 let clear_btn = Button::image_and_text(clear_icon, "Clear");
                 let response = ui.add(clear_btn);
 
@@ -53,7 +57,7 @@ impl TodoView {
                     self.handler.push_commands(&remove);
                 }
 
-                let load_icon = egui::include_image!("../../assets/images/sync.png");
+                let load_icon = self.images.sync.clone();
                 let load_btn = Button::image_and_text(load_icon, "Load");
                 let response = ui.add(load_btn);
 
@@ -75,7 +79,7 @@ impl TodoView {
 
     fn create_search_bar(&mut self, ui: &mut Ui) {
         if self.cache.activate_search {
-            let cancel_icon = egui::include_image!("../../assets/images/close.png");
+            let cancel_icon = self.images.close.clone();
             let cancel_btn = Button::image_and_text(cancel_icon, "Cancel");
             let response = ui.add(cancel_btn);
 
@@ -290,14 +294,4 @@ impl TodoView {
             self.cache.undone = divided.1;
         }
     }
-}
-
-fn menu_bar(ui: &mut Ui) {
-    menu::bar(ui, |ui| {
-        ui.menu_button("File", |ui| {
-            if ui.button("Open").clicked() {
-                // …
-            }
-        });
-    });
 }
