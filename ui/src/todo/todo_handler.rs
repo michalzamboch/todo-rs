@@ -1,8 +1,8 @@
 #![allow(dead_code)]
 
-use backend::{todo_dto::*, types::traits::dao::*};
+use backend::{todo_dto::*, todo_filter::*, types::traits::dao::*};
 
-use super::todo_pipeline::*;
+use super::{todo_cache::TodoCache, todo_pipeline::*};
 
 #[derive(Debug, Clone)]
 pub struct TodoViewHandler {
@@ -28,7 +28,28 @@ impl TodoViewHandler {
         self.pipeline.push_array(cmds);
     }
 
-    pub fn execute_pipeline(&mut self) -> bool {
+    pub fn process_pipeline(&mut self, cache: &mut TodoCache) {
+        let update = self.execute_pipeline();
+        if update {
+            self.data_update(cache);
+        }
+    }
+
+    fn execute_pipeline(&mut self) -> bool {
         self.pipeline.execute()
+    }
+
+    fn data_update(&self, cache: &mut TodoCache) {
+        let all_todos = self.dao.get_all();
+        let divided = split_done_undone(&all_todos);
+        cache.done = divided.0;
+
+        if cache.activate_search {
+            let search_term = &cache.search_term;
+            let filtered = FilterTodosBy::new().title(search_term).filter(&divided.1);
+            cache.undone = filtered;
+        } else {
+            cache.undone = divided.1;
+        }
     }
 }

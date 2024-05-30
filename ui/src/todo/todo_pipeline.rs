@@ -132,4 +132,8 @@ impl TodoPipeline {
             self.push(cmd);
         }
     }
+
+    pub fn clear(&mut self) {
+        self.commands.clear();
+    }
 }

@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 
-use backend::{todo_dto::*, todo_filter::*, types::traits::dao::*};
+use backend::{todo_dto::*, types::traits::dao::*};
 use eframe::egui::{self, *};
 
 use super::{
@@ -12,7 +12,6 @@ use super::{
 
 #[derive(Debug)]
 pub struct TodoView {
-    dao: DaoRef<TodoDTO>,
     handler: Box<TodoViewHandler>,
     cache: Box<TodoCache>,
     images: Box<TodoImages>,
@@ -24,7 +23,6 @@ pub fn create_filled_todo_view(dao: DaoRef<TodoDTO>) -> Box<TodoView> {
     let images = create_todo_images();
 
     let app_view = TodoView {
-        dao,
         handler,
         cache,
         images,
@@ -35,7 +33,7 @@ pub fn create_filled_todo_view(dao: DaoRef<TodoDTO>) -> Box<TodoView> {
 
 impl TodoView {
     pub fn update(&mut self, ctx: &egui::Context) {
-        self.process_pipeline();
+        self.handler.process_pipeline(&mut self.cache);
         self.create_header(ctx);
         self.create_right_panel(ctx);
         self.create_central_layout(ctx);
@@ -272,26 +270,5 @@ impl TodoView {
                 self.cache.new_title.clear();
             }
         });
-    }
-
-    fn process_pipeline(&mut self) {
-        let update = self.handler.execute_pipeline();
-        if update {
-            self.data_update();
-        }
-    }
-
-    fn data_update(&mut self) {
-        let all_todos = self.dao.get_all();
-        let divided = split_done_undone(&all_todos);
-        self.cache.done = divided.0;
-
-        if self.cache.activate_search {
-            let search_term = &self.cache.search_term;
-            let filtered = FilterTodosBy::new().title(search_term).filter(&divided.1);
-            self.cache.undone = filtered;
-        } else {
-            self.cache.undone = divided.1;
-        }
     }
 }
