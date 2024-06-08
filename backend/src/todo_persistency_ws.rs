@@ -42,7 +42,10 @@ impl IPeristency<TodoDTO> for TodoPersistencyWS {
     }
 
     fn save(&self, data: &[TodoDTO]) -> Result<(), Box<dyn Error>> {
-        todo!()
+        let result = serde_json::to_vec(data)?;
+        self.socket.borrow_mut().send(Message::Binary(result))?;
+
+        Ok(())
     }
 }
 
