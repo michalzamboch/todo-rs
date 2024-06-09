@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 
-use crate::types::traits::persistency::*;
+use crate::{todo_persistency_dummy::create_empty_todo_persistency, types::traits::persistency::*};
 
 use crate::todo_dto::TodoDTO;
 
@@ -18,11 +18,15 @@ struct TodoPersistencyWS {
 }
 
 pub fn create_todo_ws_persistency(address: &str) -> Box<dyn IPeristency<TodoDTO>> {
-    Box::new(create(address))
+    match create(address) {
+        Ok(persistency) => Box::new(persistency),
+        Err(_) => create_empty_todo_persistency(),
+    }
 }
 
-fn create(address: &str) -> TodoPersistencyWS {
-    let (socket, response) = connect(Url::parse(address).unwrap()).expect("Can't connect");
+fn create(address: &str) -> Result<TodoPersistencyWS, Box<dyn Error>> {
+    let url = Url::parse(address)?;
+    let (socket, response) = connect(url)?;
 
     let ref_socket = RefCell::from(socket);
 
@@ -33,12 +37,20 @@ fn create(address: &str) -> TodoPersistencyWS {
         println!("* {}", header);
     }
 
-    TodoPersistencyWS { socket: ref_socket }
+    let persistency = TodoPersistencyWS { socket: ref_socket };
+    Ok(persistency)
 }
 
 impl IPeristency<TodoDTO> for TodoPersistencyWS {
     fn load(&self) -> Result<Vec<TodoDTO>, Box<dyn Error>> {
-        todo!()
+        let msg = self.socket.borrow_mut().read()?;
+        let mut result: Vec<TodoDTO> = vec![];
+
+        if let Message::Binary(bin_msg) = msg {
+            result = serde_json::from_slice(&bin_msg)?;
+        }
+
+        Ok(result)
     }
 
     fn save(&self, data: &[TodoDTO]) -> Result<(), Box<dyn Error>> {
